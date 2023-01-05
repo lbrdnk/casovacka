@@ -12,3 +12,9 @@ web-build/
 
 # macOS
 .DS_Store
+
+.lsp
+.clj-kondo
+.calva
+.shadow-cljs
+app
