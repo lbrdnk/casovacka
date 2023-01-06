@@ -3,30 +3,10 @@
 
 // export default App;
 
-// import { StatusBar } from 'expo-status-bar';
-// import { StyleSheet, Text, View } from 'react-native';
-
-// export default function App() {
-//   return (
-//     <View style={styles.container}>
-//       <Text>Open up App.js to start working on your app!</Text>
-//       <StatusBar style="auto" />
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
 
 // import React from 'react';
 // import { View } from 'react-native';
-import { GLView } from 'expo-gl';
+// import { GLView } from 'expo-gl';
 
 // export default function App() {
 //   return (
@@ -79,13 +59,7 @@ import { GLView } from 'expo-gl';
 //   gl.endFrameEXP();
 // }
 
-
-
-
-
-
 import { GLView } from 'expo-gl';
-// import { GLView } from 'expo';
 import Expo2DContext from 'expo-2d-context';
 import React from 'react'; export default class App extends React.Component {
   render() {
