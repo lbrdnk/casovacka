@@ -1,5 +1,6 @@
 (ns casovacka.core
   (:require
+   [casovacka.screens.main :refer [main]]
    ["react-native" :as rn]
    [reagent.core :as r]
    [shadow.expo :as expo]))
@@ -18,7 +19,8 @@
           (rn/StyleSheet.create)))
 
 (defn root []
-  [:> rn/View {:style (.-container styles)}
+  [main]
+  #_[:> rn/View {:style (.-container styles)}
    [:> rn/Text {:style (.-title styles)} "Hello friend!"]])
 
 (defn start
