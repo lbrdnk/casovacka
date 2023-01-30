@@ -8,11 +8,9 @@
      [:> rn/Text "edit"]])
 
 (defn home-screen
-  {:displayName "HomeScreen"}
-  [props]
-  [:> HomeScreen props])
+    [props]
+    [:> HomeScreen props])
 
 (defn interval-screen
-  {:displayName "IntervalScreen"}
   [props]
   [:> IntervalScreen props])
