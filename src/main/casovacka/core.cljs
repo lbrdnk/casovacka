@@ -15,6 +15,10 @@
    
    ))
 
+;;; TODO following will be needed later probably
+#_(defonce functional-compiler (reagent.core/create-compiler {:function-components true}))
+#_(reagent.core/set-default-compiler! functional-compiler)
+
 #_(def Simple (-> (js/require "../src/gen/components/Simple.js") ))
 
 (def Hud (-> (js/require "../src/gen/components/HUD.js") (goog.object.get "default")))
