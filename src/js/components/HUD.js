@@ -2,35 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 // import { Canvas, Fill, Paint, Group, Rect, Text, useFont, useSpring } from "@shopify/react-native-skia";
 import { useValueEffect, useValue, useClockValue, useCanvas, Canvas, Group, Text, Rect, TextPath, Skia, useFont, vec, useSpring, Paint, Fill } from "@shopify/react-native-skia";
 import { Button, Dimensions, Dimenstions, StyleSheet, View } from "react-native";
+// following line is not parsable by shadow-cjls, hence using babel
 import * as RN from "react-native"
 
-const interval = {
-  duration: 600,
-  title: "Rope jumping",
-  intervals: [
-    {
-      title: "Prepare",
-      duration: 20
-    },
-    {
-      repeat: 3,
-      intervals: [
-        {
-          title: "Jump",
-          duration: 150,
-        },
-        {
-          title: "Rest",
-          duration: 30,
-        }
-      ]
-    },
-    {
-      title: "Cooldown"
-      // compute what left to 600 -- 40
-    }
-  ]
-}
+const myFont = require("../../../assets/Roboto-Regular.ttf");
+
 
 // const hudElementDimensions = (offset, font, text) => {
 //   const w = Dimensions.get("window").width
@@ -84,14 +60,14 @@ function HUDElement({ x = 0 }) {
 
   const fontSize = 32;
   // TODO avoid relative require
-  const font = useFont(require("../../../../../assets/Roboto-Black.ttf"), fontSize);
+  const font = useFont(myFont, fontSize);
   if (font === null) {
     return null;
   }
   const rw = 30
   const rh = h
 
-  const tw = font.getTextWidth("Hello World")
+  const tw = font.getTextWidth("Hello World NAZDAR cauko")
 
   return (
     <>
@@ -102,7 +78,7 @@ function HUDElement({ x = 0 }) {
         // x={c.size.current.width / 2 - font.getTextWidth("Hello World") / 2}
         x={0 - tw / 2}
         y={128 + fontSize / 2 + fontSize} // instead of - 5, I should be finding mid correctly
-        text="Hello World"
+        text="Hello World xix"
         font={font}
       />
     </>
@@ -125,7 +101,10 @@ function HUDElement({ x = 0 }) {
 
 */
 
-export default function HUD() {
+export default function HUD({running, startTime}) {
+
+  console.log(running, startTime)
+
   const [toggled, setToggled] = useState(false);
   const position = useSpring(toggled ? 100 : 0);
   const w = Dimensions.get("window").width
@@ -165,7 +144,6 @@ export default function HUD() {
     <View style={{ flex: 1, flexDirection: "row", alignItems: "center", backgroundColor: "lightcyan" }}>
       <Canvas style={{ alignSelf: "stretch", backgroundColor: "lightyellow", width: 100, minWidth: 100 }}>
         <HUDElement x={0} />
-        <HUDElement x={1} />
       </Canvas>
       <View style={{flex: 1}}>
         <Button style={{}} title="redraw" onPress={() => setRedraw(redraw + 1)} />
@@ -174,12 +152,12 @@ export default function HUD() {
         <Button style={{}} title="reset" onPress={() => cv.current = 0} />
         <RN.TextInput
           style={{
-            backgroundColor: "lightgreen",
+            backgroundColor: "lightred",
             // flex: 1
           }}
           // value={tr.current}
           // onChangeText={(text) => {tr.current = text; console.log(tr.current); console.log(v.current)}}
-          
+
         />
       </View>
     </View>

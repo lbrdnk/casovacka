@@ -1,32 +1,45 @@
 (ns casovacka.core
   (:require
-   [casovacka.screens.main :refer [main]]
+  ;;  [casovacka.screens.main :refer [main]]
+   #_["/components/HUD" :as Hud]
+  ;;  ["/components/Simple" :as s]
+   [casovacka.db :as db]
+   [goog.object :as gobj]
    ["react-native" :as rn]
    [reagent.core :as r]
-   [shadow.expo :as expo]))
+   [re-frame.core :as rf]
+   [shadow.expo :as expo]
+   
+   ;; dev
+   [casovacka.navigation :refer [navigation]]
+   
+   ))
 
-(def styles
-  ^js (-> {:container
-           {:flex 1
-            :backgroundColor "#fff"
-            :alignItems "center"
-            :justifyContent "center"}
-           :title
-           {:fontWeight "bold"
-            :fontSize 24
-            :color "blue"}}
-          (clj->js)
-          (rn/StyleSheet.create)))
+#_(def Simple (-> (js/require "../src/gen/components/Simple.js") ))
+
+(def Hud (-> (js/require "../src/gen/components/HUD.js") (goog.object.get "default")))
+
+(comment
+  Hud
+  (goog.object.get Hud "default")
+)
 
 (defn root []
-  [main]
-  #_[:> rn/View {:style (.-container styles)}
-   [:> rn/Text {:style (.-title styles)} "Hello friend!"]])
+  #_[:> rn/View {:style {:flex 1 :justify-content "center" :align-items "center"}}
+  ;;  [#'main]
+  ;;  [:> s/Simple]
+   [:> Hud]
+   #_[:> (js/goog.object.get Simple "Simple")]]
+  
+  #_[home]
+  
+  [navigation])
 
 (defn start
   {:dev/after-load true}
   []
-  (expo/render-root (r/as-element [root])))
+  (expo/render-root (r/as-element [#'root])))
 
 (defn init []
+  (rf/dispatch-sync [::db/initialize])
   (start))
