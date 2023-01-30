@@ -1,16 +1,22 @@
 ;; shadow-cljs configuration
 {:source-paths
- ["src/dev"
-  "src/main"
-  "src/test"]
+ ["src/main"
+  "src/gen"
+  "scr/dev"]
 
  :dependencies
- [[reagent "1.1.1"]]
+ [[reagent "1.1.1"]
+  [re-frame "1.3.0"]]
+
+;;  :external-index "foo/bar.js"
 
  :builds
  {:app
   {:target :react-native
    :init-fn casovacka.core/init
    :output-dir "app"
+;;    :external-index "foo/bar.js"
+   #_#_:js-options {:js-provider :external
+                :external-index "foo/bar.js"}
    :devtools {:autoload true
               :preloads [shadow.expo.keep-awake]}}}}
