@@ -1,7 +1,7 @@
 import { FlatList, Text } from "react-native";
 import HomeItem from "./HomeItem"
 
-export default function Home(props) {
+export default function HomeScreen(props) {
 
   console.log(Object.keys(props))
 
