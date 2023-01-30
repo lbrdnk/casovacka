@@ -19,3 +19,4 @@ web-build/
 .shadow-cljs
 app
 BAK__*
+src/gen/**
