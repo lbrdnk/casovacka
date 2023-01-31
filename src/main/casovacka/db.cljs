@@ -2,7 +2,7 @@
   (:require [re-frame.core :as rf]))
 
 (comment
-  re-frame.db/app-db
+  (-> @re-frame.db/app-db :selected-interval)
   )
 
 ;;; grammar
@@ -10,7 +10,8 @@
 ;;;   
 
 (def rope-interval
-  {:duration 600
+  {:id "rope"
+   :duration 600
    :title "Rope jumping"
    :intervals [{:title "Prepare"
                 :duration 20}
@@ -24,7 +25,8 @@
                 }]})
 
 (def basic-upper-body-interval
-  {:title "Basic upper body"
+  {:id "basic"
+   :title "Basic upper body"
    :intervals [{:duration 1200 ; 20min
                 :title "Warmup"
                 :intervals [{:repeat 2
@@ -73,10 +75,58 @@
                                          {:title "Rest"
                                           :duration 30}]}]}]})
 
-(defonce empty-db {:tmp/intervals {"basic" basic-upper-body-interval
-                                   "rope" rope-interval}})
+(rf/reg-fx
+ :nav
+ (fn [[nav dest]]
+   (.navigate nav dest)))
+
+(def empty-db {:intervals {"basic" basic-upper-body-interval
+                           "rope" rope-interval}})
 
 (rf/reg-event-db
  ::initialize
  (fn [_ _] empty-db))
 
+
+;;; go to screen
+;;; home
+;;;   - existing timers
+;;; interval
+;;;   - time where it has stopped
+
+(comment
+  (rf/clear-event :interval-selected)
+  (rf/clear-event :home-screen/interval-selected)
+  )
+
+(rf/reg-event-fx
+ :home-screen/interval-selected
+ (fn [{:keys [db]} [_ interval-id navigation]]
+   {:db (assoc db :selected-interval-id interval-id)
+    ;; navigation `react navigation` object and interval is path to be reached
+    :nav [navigation "interval"]}))
+
+;;; tmp
+(rf/reg-sub
+ :selected-interval-title
+ (fn [db _]
+   (get-in db [:intervals (:selected-interval-id db) :title])))
+
+(comment
+  (-> @re-frame.db/app-db :selected-interval-id)
+  (some #(when (= (:id %) (:selected-interval-id @re-frame.db/app-db)) %) (:intervals @re-frame.db/app-db))
+)
+
+(defn assoc-handler [interval navigation]
+  (assoc interval :onPressHandler #(rf/dispatch [:home-screen/interval-selected (:id interval) navigation])))
+
+(rf/reg-sub
+ :home-screen/interval-list-items
+ (fn [db [_ navigation]]
+   (let [intervals (map #(select-keys % [:id :title]) (-> db :intervals vals))
+         with-handlers (mapv #(assoc-handler % navigation) intervals)]
+     with-handlers)))
+
+(comment
+  (rf/dispatch-sync [::initialize])
+  )

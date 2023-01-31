@@ -1,6 +1,14 @@
 import { View, Text } from "react-native";
 
 export default function IntervalScreen(props) {
+  
+  // console.log(Object.keys(props))
+  // console.log(props.title)
+
+  const {
+    title
+  } = props;
+
   return (
     <View
       style={{
@@ -8,7 +16,7 @@ export default function IntervalScreen(props) {
         justifyContent: "center",
         alignItems: "center"
       }}>
-      <Text>Interval</Text>
+      <Text>{title}</Text>
     </View>
   )
 }
