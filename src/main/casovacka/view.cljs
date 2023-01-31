@@ -1,5 +1,12 @@
 (ns casovacka.view
-  (:require [re-frame.core :as rf]))
+  (:require ["@react-navigation/bottom-tabs" :refer [createBottomTabNavigator]]
+            ["@react-navigation/native" :refer [NavigationContainer]]
+            [re-frame.core :as rf]
+            [reagent.core :as r]
+            
+            ;; tmp
+            ;; [casovacka.navigation :refer [navigation]]
+            ))
 
 (def HomeScreen (-> (js/require "../src/gen/HomeScreen.js") .-default))
 (def IntervalScreen (-> (js/require "../src/gen/IntervalScreen.js") .-default))

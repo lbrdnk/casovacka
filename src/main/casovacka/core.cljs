@@ -12,8 +12,16 @@
    
    ;; dev
    [casovacka.navigation :refer [navigation]]
+   [casovacka.storybook :as sb]
    
    ))
+
+(goog-define STORYBOOK false)
+
+(comment
+  STORYBOOK
+  )
+
 
 ;;; TODO following will be needed later probably
 #_(defonce functional-compiler (reagent.core/create-compiler {:function-components true}))
@@ -37,7 +45,9 @@
   
   #_[home]
   
-  [navigation])
+  (if STORYBOOK
+    [sb/with-storybook]
+    [navigation]))
 
 (defn start
   {:dev/after-load true}

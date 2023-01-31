@@ -11,7 +11,9 @@
 (def Stack (createNativeStackNavigator))
 
 (defn navigation []
-  [:> NavigationContainer
+  ;; independent because of storybook nesting
+  ;; TODO verify if this wont cause problems
+  [:> NavigationContainer {:independent true}
    [:> (.-Navigator Stack)
     [:> (.-Screen Stack) {:name "home"
                           :component (r/reactify-component (with-meta view/home-screen

@@ -1,8 +1,8 @@
 {
   "name": "casovacka",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
-  "main-boilerplate-delete-later": "./app/index.js",
+  "main-boilerplate-delete-later": "node_modules/expo/AppEntry.js",
+  "main": "./app/index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@expo/webpack-config": "^0.17.2",
     "@react-native-async-storage/async-storage": "~1.17.3",
+    "@react-navigation/bottom-tabs": "^6.5.4",
     "@react-navigation/native": "^6.1.2",
     "@react-navigation/native-stack": "^6.9.8",
     "@shopify/react-native-skia": "0.1.157",
