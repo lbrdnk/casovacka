@@ -1,21 +1,25 @@
 {
   "name": "casovacka",
   "version": "1.0.0",
-  "main-boilerplate-delete-later": "node_modules/expo/AppEntry.js",
-  "main": "./app/index.js",
+  "main": "node_modules/expo/AppEntry.js",
+  "main-boilerplate-delete-later": "./app/index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "shadow:dev:calva": "npx shadow-cljs -d cider/cider-nrepl:0.28.5 watch :app",
-    "babel": "npx babel --config-file ./src/js/.babelrc --watch --out-dir src/gen src/js"
+    "babel": "npx babel --config-file ./src/js/.babelrc --watch --out-dir src/gen src/js",
+    "prestart": "sb-rn-get-stories",
+    "storybook-watcher": "sb-rn-watcher"
   },
   "dependencies": {
     "@expo/webpack-config": "^0.17.2",
+    "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-navigation/native": "^6.1.2",
     "@react-navigation/native-stack": "^6.9.8",
     "@shopify/react-native-skia": "0.1.157",
+    "@storybook/react-native": "^6.0.1-beta.12",
     "@types/react": "~18.0.24",
     "@types/react-native": "~0.70.6",
     "create-react-class": "^15.7.0",
@@ -32,6 +36,7 @@
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.12.9",
     "@babel/plugin-transform-react-jsx": "^7.20.7",
+    "@storybook/core-common": "^6.3",
     "shadow-cljs": "^2.20.19"
   },
   "private": true
