@@ -109,7 +109,7 @@
 
 ;;; tmp
 (rf/reg-sub
- :selected-interval-title
+ :selected-timer.sub/title
  (fn [db _]
    (get-in db [:intervals (:selected-interval-id db) :title])))
 
@@ -146,8 +146,24 @@
 
 (rf/reg-fx
  :stop-timer
- (fn [raf-id]
-   (js/cancelAnimationFrame raf-id)))
+ (fn [[raf-id events]]
+   (js/cancelAnimationFrame raf-id)
+   (doseq [e events] (rf/dispatch e))))
+
+
+(rf/reg-event-db
+ :stop-timer/stopped
+ (fn [db _]
+   (-> db
+       (assoc :selected-timer/running false
+              :selected-timer/current-ms 0
+              :selected-timer/raf-id nil)
+       (update :selected-timer/total-ms + (:selected-timer/current-ms db)))))
+
+(rf/reg-event-db
+ :stop-timer/reset
+ (fn [db _]
+   (assoc db :selected-timer/total-ms 0)))
 
 (rf/reg-cofx
  :now
@@ -158,42 +174,30 @@
  :interval-screen/start-pressed
  [(rf/inject-cofx :now)]
  (fn [{:keys [db now]} _]
+   ;; after timer starts db should be update, not as here, prior to start or?
    {:db (assoc db
-               :selected-timer-running true
-               :selected-timer-current-ms 0)
+               :selected-timer/running true
+               :selected-timer/current-ms 0)
     :start-timer now}))
 
 (rf/reg-event-db
  :tick
  (fn [db [_ passed-ms raf-id]]
    (-> db
-       (assoc :selected-timer-raf-id raf-id
-              :selected-timer-current-ms passed-ms))))
+       (assoc :selected-timer/raf-id raf-id
+              :selected-timer/current-ms passed-ms))))
 
 ;; update to pressed -> fx stop -> e stopped
 (rf/reg-event-fx
  :interval-screen/stop-pressed
  (fn [{:keys [db]} _]
-   {:db (-> db
-            (update :selected-timer-total-ms + (:selected-timer-current-ms db))
-            (assoc :selected-timer-running false
-                   :selected-timer-current-ms 0))
-    :stop-timer (:selected-timer-raf-id db)}))
+   {:stop-timer [(:selected-timer/raf-id db) [[:stop-timer/stopped]]]}))
 
 (rf/reg-event-fx
  :interval-screen/reset-pressed
  (fn [{:keys [db]} _]
-   {:fx [[:stop-timer (:selected-timer-raf-id db)]
-         [:db (assoc db
-                     :selected-timer-total-ms 0
-                     :selected-timer-current-ms 0
-                     :selected-timer-running false)]]}
-   #_{:fx [[:dispatch [:interval-screen/stop-pressed]]]}
-   #_{:db (assoc db
-                 :selected-timer-total-ms 0
-                 :selected-timer-current-ms 0
-                 :selected-timer-running false)
-      :stop-timer (:selected-timer-raf-id db)}))
+   {:stop-timer [(:selected-timer/raf-id db) [[:stop-timer/stopped] [:stop-timer/reset]]]}))
+
 
 ;; TODO variable length, hiding hn, hiding h, ...
 (defn ms->timer-str [ms]
@@ -205,12 +209,12 @@
     (str (gstr/format "%d:%02d:%02d.%02d" h m s hn))))
 
 (rf/reg-sub
- :selected-timer-str
+ :selected-timer.sub/time-str
  (fn [db _]
    ;; TODO or probably redundant
-   (ms->timer-str (+ (:selected-timer-total-ms db) (:selected-timer-current-ms db)))))
+   (ms->timer-str (+ (:selected-timer/total-ms db) (:selected-timer/current-ms db)))))
 
 (rf/reg-sub
- :interval-screen.sub/running
+ :selected-timer.sub/running
  (fn [db _]
-   (:selected-timer-running db)))
+   (:selected-timer/running db)))

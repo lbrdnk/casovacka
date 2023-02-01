@@ -28,9 +28,9 @@
 
 (defn interval-screen
   [props]
-  (let [title @(rf/subscribe [:selected-interval-title])
-        time-str @(rf/subscribe [:selected-timer-str])
-        running @(rf/subscribe [:interval-screen.sub/running])
+  (let [title @(rf/subscribe [:selected-timer.sub/title])
+        time-str @(rf/subscribe [:selected-timer.sub/time-str])
+        running @(rf/subscribe [:selected-timer.sub/running])
         props (merge props
                      {:title title
                       :timeStr time-str
