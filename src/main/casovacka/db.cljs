@@ -1,5 +1,6 @@
 (ns casovacka.db
-  (:require [re-frame.core :as rf]))
+  (:require [goog.string :as gstr]
+            [re-frame.core :as rf]))
 
 (comment
   (-> @re-frame.db/app-db :selected-interval)
@@ -130,3 +131,86 @@
 (comment
   (rf/dispatch-sync [::initialize])
   )
+
+;;; timer screen
+
+(rf/reg-fx
+ :start-timer
+ (fn [start]
+   (letfn [(tick! []
+             (let [now (.now js/Date)
+                   delta (- now start)
+                   raf-id (js/requestAnimationFrame tick!)]
+               (rf/dispatch [:tick delta raf-id])))]
+     (tick!))))
+
+(rf/reg-fx
+ :stop-timer
+ (fn [raf-id]
+   (js/cancelAnimationFrame raf-id)))
+
+(rf/reg-cofx
+ :now
+ (fn [cofx _]
+   (assoc cofx :now (.now js/Date))))
+
+(rf/reg-event-fx
+ :interval-screen/start-pressed
+ [(rf/inject-cofx :now)]
+ (fn [{:keys [db now]} _]
+   {:db (assoc db
+               :selected-timer-running true
+               :selected-timer-current-ms 0)
+    :start-timer now}))
+
+(rf/reg-event-db
+ :tick
+ (fn [db [_ passed-ms raf-id]]
+   (-> db
+       (assoc :selected-timer-raf-id raf-id
+              :selected-timer-current-ms passed-ms))))
+
+;; update to pressed -> fx stop -> e stopped
+(rf/reg-event-fx
+ :interval-screen/stop-pressed
+ (fn [{:keys [db]} _]
+   {:db (-> db
+            (update :selected-timer-total-ms + (:selected-timer-current-ms db))
+            (assoc :selected-timer-running false
+                   :selected-timer-current-ms 0))
+    :stop-timer (:selected-timer-raf-id db)}))
+
+(rf/reg-event-fx
+ :interval-screen/reset-pressed
+ (fn [{:keys [db]} _]
+   {:fx [[:stop-timer (:selected-timer-raf-id db)]
+         [:db (assoc db
+                     :selected-timer-total-ms 0
+                     :selected-timer-current-ms 0
+                     :selected-timer-running false)]]}
+   #_{:fx [[:dispatch [:interval-screen/stop-pressed]]]}
+   #_{:db (assoc db
+                 :selected-timer-total-ms 0
+                 :selected-timer-current-ms 0
+                 :selected-timer-running false)
+      :stop-timer (:selected-timer-raf-id db)}))
+
+;; TODO variable length, hiding hn, hiding h, ...
+(defn ms->timer-str [ms]
+  (let [[h hr] [(quot ms 3600000) (rem ms 3600000)]
+        [m mr] [(quot hr 60000) (rem hr 60000)]
+        [s sr] [(quot mr 1000) (rem mr 1000)]
+        ;; hn hundredth
+        hn (quot sr 100)]
+    (str (gstr/format "%d:%02d:%02d.%02d" h m s hn))))
+
+(rf/reg-sub
+ :selected-timer-str
+ (fn [db _]
+   ;; TODO or probably redundant
+   (ms->timer-str (+ (:selected-timer-total-ms db) (:selected-timer-current-ms db)))))
+
+(rf/reg-sub
+ :interval-screen.sub/running
+ (fn [db _]
+   (:selected-timer-running db)))

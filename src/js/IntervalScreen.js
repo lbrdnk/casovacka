@@ -1,12 +1,18 @@
-import { View, Text } from "react-native";
+import { Button, View, Text } from "react-native";
 
 export default function IntervalScreen(props) {
-  
+
   // console.log(Object.keys(props))
   // console.log(props.title)
 
   const {
-    title
+    title = "interval title",
+    timeStr = "00:00:01.12", // 00:00:01.12
+    running = false, // also should not be here?
+    startEpoch, // should not be here !!!
+    startPressedHandler = () => console.log("start"),
+    stopPressedHandler = () => console.log("stop"),
+    resetPressedHandler = () => console.log("reset")
   } = props;
 
   return (
@@ -17,6 +23,15 @@ export default function IntervalScreen(props) {
         alignItems: "center"
       }}>
       <Text>{title}</Text>
+      <Text style={{fontVariant: ['tabular-nums']}}>{timeStr}</Text>
+      {
+        running ? (
+          <Button title="stop" disabled={false} onPress={stopPressedHandler} />
+        ) : (
+          <Button title="start" disabled={false} onPress={startPressedHandler} />
+        )
+      }
+      <Button title="reset" onPress={resetPressedHandler} />
     </View>
   )
 }

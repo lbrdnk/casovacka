@@ -24,10 +24,19 @@
     #_(def p2 props)
     [:> HomeScreen props]))
 
+
+
 (defn interval-screen
   [props]
   (let [title @(rf/subscribe [:selected-interval-title])
+        time-str @(rf/subscribe [:selected-timer-str])
+        running @(rf/subscribe [:interval-screen.sub/running])
         props (merge props
-                     {:title title})]
+                     {:title title
+                      :timeStr time-str
+                      :running running
+                      :startPressedHandler #(rf/dispatch [:interval-screen/start-pressed])
+                      :stopPressedHandler #(rf/dispatch [:interval-screen/stop-pressed])
+                      :resetPressedHandler #(rf/dispatch [:interval-screen/reset-pressed])})]
     #_(def p props)
     [:> IntervalScreen props]))
