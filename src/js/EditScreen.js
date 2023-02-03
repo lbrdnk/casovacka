@@ -41,7 +41,7 @@ function Intervals(props) {
             style={{ flex: 1 }}
         >
             <View style={{ borderWidth: 2, padding: 2, margin: 2, alignSelf: "flex-end" }}>
-                <Button title="old interval" />
+                <Button title="new interval" />
             </View>
             <FlatList
                 data={items}
