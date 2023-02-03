@@ -26,11 +26,12 @@ export default function IntervalScreen(props) {
       <Text style={{fontVariant: ['tabular-nums']}}>{timeStr}</Text>
       {
         running ? (
-          <Button title="stop" disabled={false} onPress={stopPressedHandler} />
+          <Button title="stop" onPress={stopPressedHandler} />
         ) : (
-          <Button title="start" disabled={false} onPress={startPressedHandler} />
+          <Button title="start" onPress={startPressedHandler} />
         )
       }
+
       <Button title="reset" onPress={resetPressedHandler} />
     </View>
   )
