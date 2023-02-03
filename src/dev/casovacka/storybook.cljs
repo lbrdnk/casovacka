@@ -4,9 +4,22 @@
             [reagent.core :as r]
             ;; tmp
             [casovacka.navigation :refer [navigation]]
+            
+            ["@storybook/react-native" :as sb]
 
+            #_["/storybook/Storybook$default" :as Storybook]
             ;; tmp
             ["@expo/vector-icons/MaterialCommunityIcons$default" :as MaterialCommunityIcons]))
+
+(comment
+
+  (def s (sb/getStorybook))
+  s
+
+  (-> (sb/raw) js->clj (nth 1))
+  )
+
+(defonce sb-nav-state (atom nil))
 
 (def Storybook (-> (js/require "../.storybook/Storybook.js") .-default))
 
@@ -31,7 +44,10 @@
               :tabBarInactiveTintColor "gray"})))
 
 (defn with-storybook [props]
-  [:> NavigationContainer
+  [:> NavigationContainer 
+   {:independent true
+    :initialState @sb-nav-state
+    :onStateChange #(reset! sb-nav-state %)}
    [:> (.-Navigator Tab) {:screenOptions screen-options}
     [:> (.-Screen Tab)
      {:name "App"

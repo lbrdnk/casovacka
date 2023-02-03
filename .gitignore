@@ -20,3 +20,5 @@ web-build/
 app
 BAK__*
 src/gen/**
+
+.storybook/storybook.requires.js

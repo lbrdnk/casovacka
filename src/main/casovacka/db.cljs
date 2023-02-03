@@ -79,6 +79,8 @@
 (rf/reg-fx
  :nav
  (fn [[nav dest]]
+   (def n nav)
+   (def d dest)
    (.navigate nav dest)))
 
 (def empty-db {:intervals {"basic" basic-upper-body-interval
@@ -205,8 +207,9 @@
         [m mr] [(quot hr 60000) (rem hr 60000)]
         [s sr] [(quot mr 1000) (rem mr 1000)]
         ;; hn hundredth
-        hn (quot sr 100)]
-    (str (gstr/format "%d:%02d:%02d.%02d" h m s hn))))
+        hn (quot sr 10)]
+    ;; when updating on every frame, ui gets "stuck"
+    (str (gstr/format #_"%d:%02d:%02d" "%d:%02d:%02d.%02d" h m s hn))))
 
 (rf/reg-sub
  :selected-timer.sub/time-str
@@ -218,3 +221,19 @@
  :selected-timer.sub/running
  (fn [db _]
    (:selected-timer/running db)))
+
+;;; new timer / interval
+
+(rf/reg-event-fx
+ :home-screen/new-pressed
+ (fn [{:keys [db]} [_ navigation]]
+   ;; todo db should be signalled that we are creating new
+   {:db db
+    :nav [navigation "edit"]}))
+
+(rf/reg-event-fx
+ :edit-screen/interval-pressed
+ (fn [{:keys [db]} [_ navigation]]
+   {:db db
+    :nav [navigation "edit"]}))
+

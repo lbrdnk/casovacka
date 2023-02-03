@@ -14,6 +14,7 @@
    [casovacka.navigation :refer [navigation]]
    [casovacka.storybook :as sb]
    
+   [casovacka.dev :as dev]
    ))
 
 (goog-define STORYBOOK false)
@@ -29,9 +30,9 @@
 
 #_(def Simple (-> (js/require "../src/gen/components/Simple.js") ))
 
-(def Hud (-> (js/require "../src/gen/components/HUD.js") (goog.object.get "default")))
+#_(def Hud (-> (js/require "../src/gen/components/HUD.js") (goog.object.get "default")))
 
-(comment
+#_(comment
   Hud
   (goog.object.get Hud "default")
 )
@@ -57,3 +58,7 @@
 (defn init []
   (rf/dispatch-sync [::db/initialize])
   (start))
+
+#_(defn
+  {:dev/before-load true}
+  (reset! dev/navigation-state ))

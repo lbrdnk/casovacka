@@ -1,4 +1,4 @@
-import { FlatList, Text } from "react-native";
+import { Button, FlatList, Text } from "react-native";
 import HomeItem from "./HomeItem"
 
 export default function HomeScreen(props) {
@@ -8,10 +8,12 @@ export default function HomeScreen(props) {
 
   const {
     navigation,
-    intervalListItems
+    intervalListItems,
+    newPressedHandler = () => console.log("new")
   } = props
 
   return (
+    <>
     <FlatList
       data={intervalListItems}
       renderItem={({ item }) => <HomeItem 
@@ -20,6 +22,8 @@ export default function HomeScreen(props) {
         onPressHandler={item.onPressHandler}
       />}
     />
+    <Button title="New Interval" onPress={newPressedHandler} />
+    </>
   )
 }
 
