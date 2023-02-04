@@ -4,9 +4,9 @@ import { Button, FlatList, Text, TextInput, View } from "react-native";
 function IntervalsItem(props) {
 
     const {
-        title = "interval",
-        duration = 10,
-        repeat = 3,
+        title, //= "interval",
+        duration, //= 10,
+        repeat, //= 3,
         pressedHandler = () => console.log("pressed")
     } = props
 
@@ -16,35 +16,30 @@ function IntervalsItem(props) {
             onPress={pressedHandler}
         >
             {title && <Text>title: {title}</Text>}
-            {title && <Text>duration: {duration}</Text>}
-            {title && <Text>repeat: {repeat}</Text>}
+            {duration && <Text>duration: {duration}</Text>}
+            {repeat && <Text>repeat: {repeat}</Text>}
         </View>
     )
 }
 
-// todo into storybook
-const items = [
-    {
-        id: "xixi",
-        title: "x",
-    },
-    {
-        id: "y",
-        title: "y",
-    }
-]
-
 function Intervals(props) {
+
+    // TODO
+    //  - new button should be container "uplevel"
+    const {
+        intervals,
+        newPressedHandler,
+    } = props
 
     return (
         <View
             style={{ flex: 1 }}
         >
             <View style={{ borderWidth: 2, padding: 2, margin: 2, alignSelf: "flex-end" }}>
-                <Button title="new interval" />
+                <Button title="new interval" onPress={newPressedHandler} />
             </View>
             <FlatList
-                data={items}
+                data={intervals}
                 renderItem={({ item }) => <IntervalsItem {...item} />}
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
             />
@@ -54,9 +49,16 @@ function Intervals(props) {
 
 export default function EditScreen(props) {
 
-    const [title, setTitle] = useState("");
-    const [duration, setDuration] = useState("");
-    const [repeat, setRepeat] = useState("");
+    const {
+        // currently may be undefined, [], null
+        cancelPressedHandler,
+        intervals,
+        savePressedHandler
+    } = props;
+
+    const [title, setTitle] = useState(props.title || "");
+    const [duration, setDuration] = useState(props.duration || "");
+    const [repeat, setRepeat] = useState(props.repeat || "");
 
     return (
         <View
@@ -84,7 +86,31 @@ export default function EditScreen(props) {
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={repeat}
             />
-            <Intervals />
+            <Intervals intervals={intervals} />
+            <View style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: 2,
+                padding: 2,
+            }}>
+                <View style={{ borderWidth: 2, }}>
+                    <Button
+                        title="delete"
+                        onPress={() => savePressedHandler({ title, duration, repeat })}
+                    />
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                    <View style={{ borderWidth: 2, }}>
+                        <Button title="cancel" onPress={cancelPressedHandler} />
+                    </View>
+                    <View style={{ borderWidth: 2, marginLeft: 4 }}>
+                        <Button
+                            title="save"
+                            onPress={() => savePressedHandler({ title, duration, repeat })}
+                        />
+                    </View>
+                </View>
+            </View>
         </View>
     )
 }
