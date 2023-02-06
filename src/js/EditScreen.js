@@ -52,6 +52,7 @@ export default function EditScreen(props) {
     const {
         // currently may be undefined, [], null
         cancelPressedHandler,
+        deletePressedHandler,
         intervals,
         savePressedHandler
     } = props;
@@ -96,7 +97,7 @@ export default function EditScreen(props) {
                 <View style={{ borderWidth: 2, }}>
                     <Button
                         title="delete"
-                        onPress={() => savePressedHandler({ title, duration, repeat })}
+                        onPress={deletePressedHandler}
                     />
                 </View>
                 <View style={{ flexDirection: "row" }}>

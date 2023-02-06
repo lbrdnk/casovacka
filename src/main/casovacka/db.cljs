@@ -3,8 +3,7 @@
             [re-frame.core :as rf]))
 
 (comment
-  (-> @re-frame.db/app-db :selected-interval)
-  )
+  (-> @re-frame.db/app-db :selected-interval))
 
 ;;; grammar
 ;;;   - toplevel no title means untitled
@@ -79,8 +78,6 @@
 (rf/reg-fx
  :nav
  (fn [[nav dest]]
-   (def n nav)
-   (def d dest)
    (.navigate nav dest)))
 
 (def empty-db {:intervals {"basic" basic-upper-body-interval
@@ -99,8 +96,7 @@
 
 (comment
   (rf/clear-event :interval-selected)
-  (rf/clear-event :home-screen/interval-selected)
-  )
+  (rf/clear-event :home-screen/interval-selected))
 
 (rf/reg-event-fx
  :home-screen/interval-selected
@@ -117,8 +113,7 @@
 
 (comment
   (-> @re-frame.db/app-db :selected-interval-id)
-  (some #(when (= (:id %) (:selected-interval-id @re-frame.db/app-db)) %) (:intervals @re-frame.db/app-db))
-)
+  (some #(when (= (:id %) (:selected-interval-id @re-frame.db/app-db)) %) (:intervals @re-frame.db/app-db)))
 
 (defn assoc-handler [interval navigation]
   (assoc interval :onPressHandler #(rf/dispatch [:home-screen/interval-selected (:id interval) navigation])))
@@ -131,8 +126,7 @@
      with-handlers)))
 
 (comment
-  (rf/dispatch-sync [::initialize])
-  )
+  (rf/dispatch-sync [::initialize]))
 
 ;;; timer screen
 
@@ -226,14 +220,75 @@
 
 (rf/reg-event-fx
  :home-screen/new-pressed
- (fn [{:keys [db]} [_ navigation]]
-   ;; todo db should be signalled that we are creating new
-   {:db db
+ [(rf/inject-cofx :uuid)]
+ (fn [{:keys [db uuid]} [_ navigation]]
+   ;; empty path
+   {:db (-> (assoc db
+                   :edit-screen.selected-interval/path []
+                   :edit-screen/selected-interval {:id uuid})
+            (update :uuid/used #(conj (set %) uuid)))
     :nav [navigation "edit"]}))
 
+;;; EDIT SCREEN
+
+(defn avail-uuid [used]
+  (loop [i 0
+         uuid (str (random-uuid))]
+    (cond (>= i 5)
+          (js/Error. "Unable to generate unique uuid")
+
+          ;; TODO -- valid condition for intent?
+          (get used uuid)
+          (recur (inc i) (str (random-uuid)))
+
+          :else
+          uuid)))
+
+(rf/reg-cofx
+ :uuid
+ (fn [cofx _]
+   (let [uuid (avail-uuid (-> cofx :db :uuid/used))]
+     (assoc cofx :uuid uuid))))
+
+(rf/reg-sub
+ :edit-screen/data
+ (fn [db _]
+   ;; TODO
+   ;; selected-interval-path
+   (let [selected-interval-path (:edit-screen.selected-interval/path db)
+         selected-interval (get-in (:edit-screen/selected-interval db) selected-interval-path)]
+     ;; id, title, duration, repeat, intervals
+     (-> (update selected-interval :intervals
+                 (fn [intervals]
+                   (map #(select-keys % [:id :title :duration :repeat])
+                        intervals)))
+         (assoc :key (:id selected-interval))))))
+
+
+(defn flush-interval-edit [db]
+  (let [{:keys [id] :as selected-interval} (:edit-screen/selected-interval db)]
+    (assoc-in db [:intervals id] selected-interval)))
+
+;;; TOPLEVEL save should not be diff from others...?
+;;; view should provide different handling for toplevel? -- which does actual flush
+;;; WHEN should we actually flush?
+
+;; TODO
+;; may do handling also here
 (rf/reg-event-fx
- :edit-screen/interval-pressed
- (fn [{:keys [db]} [_ navigation]]
-   {:db db
-    :nav [navigation "edit"]}))
+ :edit-screen/save-pressed
+ (fn [{:keys [db]} [_ from-js]]
+   (let [{:keys [duration title repeat] :as upd} (js->clj from-js :keywordize-keys true)]
+     ;; write new structure into db and do cleanup
+     {:db (-> db
+              ;; update current timer values
+              ;; TODO use merge
+              (update :edit-screen/selected-interval assoc
+                      :title title
+                      :duration duration
+                      :repeat repeat)
+              ;; if toplevel, flush
+              (cond->
+               (empty? (:edit-screen.selected-interval/path db))
+                flush-interval-edit))})))
 

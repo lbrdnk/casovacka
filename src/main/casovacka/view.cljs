@@ -13,8 +13,22 @@
 #_(def EditScreen (-> (js/require "../src/gen/EditScreen.js") .-default))
 
 (defn edit-screen [props]
-  (let [props (merge props
-                     {})]
+  (let [props (merge
+
+               ;; orig props
+               props
+
+               ;; db data map
+               ;; id, title, duration, repeat
+               @(rf/subscribe [:edit-screen/data])
+
+               ;; handlers fns
+               ;; TODO
+               ;;   - missing navigation
+               {:edit-screen/savePressedHandler #(#_#_prn "save" rf/dispatch [:edit-screen/save-pressed %])
+                :edit-screen/deletePressedHandler #(prn "delete" #_#_rf/dispatch [:edit-screen/delete-pressed])
+                :edit-screen/cancelPressedHandler #(prn "cancel" #_#_rf/dispatch [:edit-screen/cancel-pressed])})]
+    (def p props)
     [:<>
      [:> EditScreen props]
      #_[:> rn/View [:> rn/Text "xixx"]]]
@@ -22,7 +36,7 @@
 
 (defn home-screen
   [props]
-  (def p props)
+  #_(def p props)
   (let [interval-list-items @(rf/subscribe [:home-screen/interval-list-items (:navigation props)])
         props (merge props
                      {:home-screen/interval-list-items interval-list-items
