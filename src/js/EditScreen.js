@@ -77,21 +77,26 @@ export default function EditScreen(props) {
             <Text>Edit!</Text>
             <TextInput
                 editable
-                onEndEditing={updateTitle}
+                onChangeText={updateTitle}
+            //     onEndEditing={ //(any) => {/*console.log(any.nativeEvent.text);*/ /*updateTitle(any.nativeEvent.text);}*/
+            //         updateTitle
+            // }
                 placeholder="title"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={title}
             />
             <TextInput
                 editable
-                onEndEditing={updateDuration}
+                onChangeText={updateDuration}
+                // onEndEditing={updateDuration}
                 placeholder="duration"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={duration}
             />
             <TextInput
                 editable
-                onEndEditing={updateRepeat}
+                onChangeText={updateRepeat}
+                // onEndEditing={updateRepeat}
                 placeholder="repeat"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={repeat}

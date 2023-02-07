@@ -1,7 +1,9 @@
 (ns casovacka.db
   (:require [goog.string :as gstr]
             [re-frame.core :as rf]
-            [casovacka.util :as u]))
+            [casovacka.util :as u]
+            
+            [goog.object :as gobj]))
 
 (comment
   (-> @re-frame.db/app-db :selected-interval))
@@ -343,6 +345,8 @@
 (rf/reg-event-db
  :edit-screen/title-changed
  (fn [db [_ val]]
+   #_(def t val)
+   #_(def x (-> val (gobj/getValueByKeys "nativeEvent" "text")))
    (assoc-selected-interval-key db :title val)))
 
 (rf/reg-event-db
@@ -364,10 +368,11 @@
 (rf/reg-event-db
  :edit-screen.header/back-pressed
  (fn [db [_ nav]]
-   ;; save tmp state
-   #_(assoc)
-   ;; remove id from path
-   ;;   
-   ;; update 
-   #_(assoc db)
-   db))
+   ;; save tmp state -- done
+   (if (-> db :edit-screen.selected-interval/path empty?)
+     ;; persist? -- currently only on save
+     ;; think it through later
+     db
+     ;; pop path
+     (update db :edit-screen.selected-interval/path u/popv))
+   #_db))

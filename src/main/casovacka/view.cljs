@@ -6,11 +6,18 @@
             ["/IntervalScreen$default" :as IntervalScreen]
             ["/HomeScreen$default" :as HomeScreen]
             
+            [goog.object :as gobj]
+
             ))
 
 #_(def HomeScreen (-> (js/require "../src/gen/HomeScreen.js") .-default))
 #_(def IntervalScreen (-> (js/require "../src/gen/IntervalScreen.js") .-default))
 #_(def EditScreen (-> (js/require "../src/gen/EditScreen.js") .-default))
+
+#_(defn text-from-event [^js e]
+  (let [text (gobj/getValueByKeys e "nativeEvent" "text")]
+    (prn text)
+    text))
 
 (defn edit-screen [props]
   (let [props (merge
@@ -31,7 +38,7 @@
                 :edit-screen/cancelPressedHandler #(prn "cancel" #_#_rf/dispatch [:edit-screen/cancel-pressed])
                 
                 ;; key, id, title, duration, repeat come from :edit-screen/data
-                :updateTitle #(rf/dispatch [:edit-screen/title-changed %])
+                :updateTitle #(do #_(prn %) (rf/dispatch [:edit-screen/title-changed %]))
                 :updateDuration #(rf/dispatch [:edit-screen/duration-changed %])
                 :updateRepeat #(rf/dispatch [:edit-screen/repeat-changed %])
                 })]
