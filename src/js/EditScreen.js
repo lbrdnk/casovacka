@@ -53,6 +53,7 @@ export default function EditScreen(props) {
         // currently may be undefined, [], null
         cancelPressedHandler,
         deletePressedHandler,
+        newPressedHandler,
         intervals,
         savePressedHandler
     } = props;
@@ -87,7 +88,7 @@ export default function EditScreen(props) {
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={repeat}
             />
-            <Intervals intervals={intervals} />
+            <Intervals intervals={intervals} {...{newPressedHandler}} />
             <View style={{
                 flexDirection: "row",
                 justifyContent: "space-between",

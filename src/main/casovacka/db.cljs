@@ -1,6 +1,7 @@
 (ns casovacka.db
   (:require [goog.string :as gstr]
-            [re-frame.core :as rf]))
+            [re-frame.core :as rf]
+            [casovacka.util :as u]))
 
 (comment
   (-> @re-frame.db/app-db :selected-interval))
@@ -78,7 +79,8 @@
 (rf/reg-fx
  :nav
  (fn [[nav dest]]
-   (.navigate nav dest)))
+   (.push nav dest)
+   #_(.navigate nav dest)))
 
 (def empty-db {:intervals {"basic" basic-upper-body-interval
                            "rope" rope-interval}})
@@ -250,14 +252,14 @@
    (let [uuid (avail-uuid (-> cofx :db :uuid/used))]
      (assoc cofx :uuid uuid))))
 
+(declare path-to-interval)
+
 (rf/reg-sub
  :edit-screen/data
  (fn [db _]
-   ;; TODO
-   ;; selected-interval-path
-   (let [selected-interval-path (:edit-screen.selected-interval/path db)
-         selected-interval (get-in (:edit-screen/selected-interval db) selected-interval-path)]
-     ;; id, title, duration, repeat, intervals
+   (let [selected-interval-path (path-to-interval (:edit-screen.selected-interval/path db))
+         selected-interval (get-in db selected-interval-path)]
+     ;; key, id, title, duration, repeat, intervals
      (-> (update selected-interval :intervals
                  (fn [intervals]
                    (map #(select-keys % [:id :title :duration :repeat])
@@ -291,4 +293,33 @@
               (cond->
                (empty? (:edit-screen.selected-interval/path db))
                 flush-interval-edit))})))
+
+;; edit screen new button handling
+
+;; TODO this also in home-screen/new-pressed
+#_(defn clear-selected [db]
+  (-> db 
+      (dissoc :edit-screen/selected-interval)
+      (assoc-in [:edit-screen/selected-interval] nil)))
+
+
+(defn path-to-interval [path-components]
+  (reduce (fn [acc id] (into acc [:intervals id]))
+          [:edit-screen.selected-interval]
+          path-components))
+
+;; should i use navigation ?
+;;
+;; 
+(rf/reg-event-fx
+ :edit-screen/new-pressed
+ [(rf/inject-cofx :uuid)]
+ (fn [{:keys [db uuid]} [_ navigation]]
+   (let [new-path (u/conjv (:edit-screen.selected-interval/path db) uuid)
+         new-interval {:id uuid}]
+     {:db (-> db
+              (assoc :edit-screen.selected-interval/path new-path)
+              (update :uuid/used u/conjs uuid)
+              (assoc-in new-path new-interval))
+      :nav [navigation "edit"]})))
 
