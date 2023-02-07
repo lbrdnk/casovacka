@@ -229,14 +229,18 @@
  :home-screen/new-pressed
  [(rf/inject-cofx :uuid)]
  (fn [{:keys [db uuid]} [_ navigation]]
-   ;; empty path
-   {:db (-> (assoc db
-                   :edit-screen.selected-interval/path []
-                   :edit-screen/selected-interval {:id uuid})
-            (update :uuid/used #(conj (set %) uuid)))
+   ;; initialized only if some interval not currently in prog of editing ie. not unsaved
+   ;; save will clear
+   {:db (cond-> db
+          ((comp not contains?) db :edit-screen/selected-interval)
+          (-> (assoc :edit-screen.selected-interval/path []
+                     :edit-screen/selected-interval {:id uuid})
+              (update :uuid/used #(conj (set %) uuid))))
     :nav [navigation "edit"]}))
 
+;;;
 ;;; EDIT SCREEN
+;;;
 
 (defn avail-uuid [used]
   (loop [i 0
@@ -259,17 +263,19 @@
 
 (declare path-to-interval)
 
+(defn data-for-edit-screen [db _]
+  (let [selected-interval-path (path-to-interval (:edit-screen.selected-interval/path db))
+        selected-interval (get-in db selected-interval-path)]
+     ;; key, id, title, duration, repeat, intervals
+    (-> (update selected-interval :intervals
+                (fn [intervals]
+                  (mapv #(select-keys % [:id :title :duration :repeat])
+                       (vals intervals))))
+        (assoc :key (:id selected-interval)))))
+
 (rf/reg-sub
  :edit-screen/data
- (fn [db _]
-   (let [selected-interval-path (path-to-interval (:edit-screen.selected-interval/path db))
-         selected-interval (get-in db selected-interval-path)]
-     ;; key, id, title, duration, repeat, intervals
-     (-> (update selected-interval :intervals
-                 (fn [intervals]
-                   (map #(select-keys % [:id :title :duration :repeat])
-                        intervals)))
-         (assoc :key (:id selected-interval))))))
+ data-for-edit-screen)
 
 
 (defn flush-interval-edit [db]
@@ -281,7 +287,7 @@
 ;;; WHEN should we actually flush?
 
 ;; TODO intervals
-(rf/reg-event-fx
+#_(rf/reg-event-fx
  :edit-screen/save-pressed
  (fn [{:keys [db]} [_ from-js]]
    (let [{:keys [duration title repeat] :as new-attributes} (js->clj from-js :keywordize-keys true)]
@@ -299,6 +305,12 @@
                 flush-interval-edit))
       #_#_:nav [navigation "back"]})))
 
+;; 
+(rf/reg-event-db
+ :edit-screen/save-pressed
+ (fn [db _]
+   db))
+
 ;; edit screen new button handling
 
 ;; TODO this also in home-screen/new-pressed
@@ -313,19 +325,19 @@
           [:edit-screen/selected-interval]
           path-components))
 
-;; should i use navigation ?
-;;
-;; 
+;; LOOKS FINE
 (rf/reg-event-fx
  :edit-screen/new-pressed
  [(rf/inject-cofx :uuid)]
  (fn [{:keys [db uuid]} [_ navigation]]
+   ;; here bug
    (let [new-path (u/conjv (:edit-screen.selected-interval/path db) uuid)
          new-interval {:id uuid}]
      {:db (-> db
               (assoc :edit-screen.selected-interval/path new-path)
               (update :uuid/used u/conjs uuid)
-              (assoc-in new-path new-interval))
+              ;; here the path is wrong
+              (assoc-in (path-to-interval new-path) new-interval))
       :nav [navigation "edit"]})))
 
 ;;;
@@ -367,12 +379,5 @@
 ;; hence should update on press into "tmp"
 (rf/reg-event-db
  :edit-screen.header/back-pressed
- (fn [db [_ nav]]
-   ;; save tmp state -- done
-   (if (-> db :edit-screen.selected-interval/path empty?)
-     ;; persist? -- currently only on save
-     ;; think it through later
-     db
-     ;; pop path
-     (update db :edit-screen.selected-interval/path u/popv))
-   #_db))
+ (fn [db _]
+   (update db :edit-screen.selected-interval/path u/popv)))

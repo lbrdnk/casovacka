@@ -10,6 +10,9 @@ function IntervalsItem(props) {
         pressedHandler = () => console.log("pressed")
     } = props
 
+    // console.log("props")
+    // console.log(props)
+
     return (
         <View
             style={{ borderWidth: 2, padding: 2, margin: 2 }}
@@ -30,6 +33,9 @@ function Intervals(props) {
         intervals,
         newPressedHandler,
     } = props
+
+    // console.log("intervals");
+    // console.log(intervals);
 
     return (
         <View
@@ -69,6 +75,9 @@ export default function EditScreen(props) {
     // const [title, setTitle] = useState(props.title || "");
     // const [duration, setDuration] = useState(props.duration || "");
     // const [repeat, setRepeat] = useState(props.repeat || "");
+
+    // console.log("toplevel intervals")
+    // console.log(intervals)
 
     return (
         <View
