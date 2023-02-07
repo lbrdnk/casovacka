@@ -2,6 +2,11 @@
   (:require [casovacka.view :as view]
             ["@react-navigation/native" :refer [NavigationContainer]]
             ["@react-navigation/native-stack" :refer [createNativeStackNavigator]]
+            
+            ;; header button "onPress"
+            ["@react-navigation/elements" :refer [HeaderBackButton]]
+
+            [goog.object :as gobj]
 
             ;; dev
             ["react-native" :as rn]
@@ -29,6 +34,18 @@
     [:> (.-Screen Stack) {:name "interval"
                           :component (r/reactify-component (with-meta view/interval-screen
                                                              {:displayName "IntervalScreen"}))}]
-    [:> (.-Screen Stack) {:name "edit"
-                          :component (r/reactify-component (with-meta view/edit-screen
-                                                             {:displayName "EditScreen"}))}]]])
+    [:> (.-Group Stack) {:screenOptions (fn [^js props]
+                                          (let [nav (gobj/get props "navigation")]
+                                            (clj->js {:headerLeft (fn [^js y]
+                                                                    (def pp props)
+                                                                    (def yy y)
+                                                                    (r/as-element [:> HeaderBackButton
+                                                                                   {:label "back"
+                                                                                    :labelVisible true
+                                                                                    :onPress (fn []
+                                                                                               (.goBack nav)
+                                                                                               (prn "PRESSED BACK"))}]))
+                                                      :headerBackTitle "back"})))}
+     [:> (.-Screen Stack) {:name "edit"
+                           :component (r/reactify-component (with-meta view/edit-screen
+                                                              {:displayName "EditScreen"}))}]]]])
