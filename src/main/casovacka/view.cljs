@@ -33,14 +33,20 @@
                ;; TODO
                ;;   - missing navigation
                {:edit-screen/newPressedHandler #(#_#_prn "xixi" rf/dispatch [:edit-screen/new-pressed (:navigation props)])
-                :edit-screen/savePressedHandler #(#_#_prn "save" rf/dispatch [:edit-screen/save-pressed %])
-                :edit-screen/deletePressedHandler #(prn "delete" #_#_rf/dispatch [:edit-screen/delete-pressed])
-                :edit-screen/cancelPressedHandler #(prn "cancel" #_#_rf/dispatch [:edit-screen/cancel-pressed])
+                :edit-screen/savePressedHandler #(#_#_prn "save" rf/dispatch [:edit-screen/save-pressed (:navigation props)])
+                
+                ;;:edit-screen/deletePressedHandler #(prn "delete" #_#_rf/dispatch [:edit-screen/delete-pressed])
+                ;;:edit-screen/cancelPressedHandler #(prn "cancel" #_#_rf/dispatch [:edit-screen/cancel-pressed])
                 
                 ;; key, id, title, duration, repeat come from :edit-screen/data
                 :updateTitle #(do #_(prn %) (rf/dispatch [:edit-screen/title-changed %]))
                 :updateDuration #(rf/dispatch [:edit-screen/duration-changed %])
                 :updateRepeat #(rf/dispatch [:edit-screen/repeat-changed %])
+                
+                ;; EditScreen component props
+                ;; 
+                :deletePressedHandler #(rf/dispatch [:edit-screen/delete-pressed (:navigation props)])
+
                 })]
     (def p props)
     [:<>
@@ -55,7 +61,7 @@
         props (merge props
                      {:home-screen/interval-list-items interval-list-items
                       :newPressedHandler #(rf/dispatch [:home-screen/new-pressed (:navigation props)])})]
-    #_(def p2 props)
+    (def ph props)
     [:> HomeScreen props]))
 
 

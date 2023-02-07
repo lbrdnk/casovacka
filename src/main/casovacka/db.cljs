@@ -2,7 +2,7 @@
   (:require [goog.string :as gstr]
             [re-frame.core :as rf]
             [casovacka.util :as u]
-            
+
             [goog.object :as gobj]))
 
 (comment
@@ -80,12 +80,13 @@
 
 (rf/reg-fx
  :nav
- (fn [[nav dest]]
-   #_(case dest
-
-     "back" (.goBack nav))
-   (.push nav dest)
-   #_(.navigate nav dest)))
+ (fn [[nav op-kw & args]]
+   (case op-kw
+     :back (.goBack nav)
+     :navigate (.navigate nav (first args))
+     :push (.push nav (first args))
+     :top (.popToTop nav))))
+(comment)
 
 (def empty-db {:intervals {"basic" basic-upper-body-interval
                            "rope" rope-interval}})
@@ -110,7 +111,7 @@
  (fn [{:keys [db]} [_ interval-id navigation]]
    {:db (assoc db :selected-interval-id interval-id)
     ;; navigation `react navigation` object and interval is path to be reached
-    :nav [navigation "interval"]}))
+    :nav [navigation :push "interval"]}))
 
 ;;; tmp
 (rf/reg-sub
@@ -236,7 +237,7 @@
           (-> (assoc :edit-screen.selected-interval/path []
                      :edit-screen/selected-interval {:id uuid})
               (update :uuid/used #(conj (set %) uuid))))
-    :nav [navigation "edit"]}))
+    :nav [navigation :push "edit"]}))
 
 ;;;
 ;;; EDIT SCREEN
@@ -270,54 +271,60 @@
     (-> (update selected-interval :intervals
                 (fn [intervals]
                   (mapv #(select-keys % [:id :title :duration :repeat])
-                       (vals intervals))))
+                        (vals intervals))))
         (assoc :key (:id selected-interval)))))
 
 (rf/reg-sub
  :edit-screen/data
  data-for-edit-screen)
 
+(defn persist-edit-screen-data [db]
+  (let [selected-interval (-> db :edit-screen/selected-interval)
+        root-id (:id selected-interval)]
+    (assoc-in db [:intervals root-id] selected-interval)))
+(comment
+  (-> @re-frame.db/app-db))
 
-(defn flush-interval-edit [db]
-  (let [{:keys [id] :as selected-interval} (:edit-screen/selected-interval db)]
-    (assoc-in db [:intervals id] selected-interval)))
+(defn clear-edit-screen-data [db]
+  (dissoc db
+          :edit-screen/selected-interval
+          :edit-screen.selected-interval/path))
 
-;;; TOPLEVEL save should not be diff from others...?
-;;; view should provide different handling for toplevel? -- which does actual flush
-;;; WHEN should we actually flush?
-
-;; TODO intervals
-#_(rf/reg-event-fx
+(rf/reg-event-fx
  :edit-screen/save-pressed
- (fn [{:keys [db]} [_ from-js]]
-   (let [{:keys [duration title repeat] :as new-attributes} (js->clj from-js :keywordize-keys true)]
-     (def na new-attributes)
-     ;; write new structure into db and do cleanup
-     {:db (-> db
-              (update :edit-screen/selected-interval assoc #_#_merge new-attributes
-                      :title title
-                      :duration duration
-                      :repeat repeat
-                      )
-              ;; if toplevel, flush
-              (cond->
-               (empty? (:edit-screen.selected-interval/path db))
-                flush-interval-edit))
-      #_#_:nav [navigation "back"]})))
+ (fn [{:keys [db]} [_ navigation]]
+   {:db (-> db
+            persist-edit-screen-data
+            clear-edit-screen-data)
+    :nav [navigation :top]}))
 
-;; 
-(rf/reg-event-db
- :edit-screen/save-pressed
- (fn [db _]
-   db))
-
-;; edit screen new button handling
+;; THIS SHALL be handling toplevel and lower level deletes
+;; TODO
+;;   use dissoc-in to make it more readable
+(rf/reg-event-fx
+ :edit-screen/delete-pressed
+ (fn [{:keys [db]} [_ navigation]]
+   (merge (let [id-path (:edit-screen.selected-interval/path db)]
+            (if (empty? id-path)
+              ;; killing toplevel interval, write to interval "store"
+              {:db (let [root-id (-> db :edit-screen/selected-interval :id)]
+                     (-> db
+                         ;; idempotent
+                         (update :intervals dissoc root-id)
+                         clear-edit-screen-data))}
+              ;; kill only branch of :edit-screen/selected-interval
+              {:db (let [[parent-path [to-del-id]]
+                         (split-at (-> id-path count dec) id-path)]
+                     (update-in db
+                                (conj (path-to-interval parent-path) :intervals)
+                                dissoc to-del-id))}))
+          {:nav [navigation :back]})))
 
 ;; TODO this also in home-screen/new-pressed
 #_(defn clear-selected [db]
-  (-> db 
-      (dissoc :edit-screen/selected-interval)
-      (assoc-in [:edit-screen/selected-interval] nil)))
+    (-> db
+        (dissoc :edit-screen/selected-interval)
+        (assoc-in [:edit-screen/selected-interval] nil)))
 
 
 (defn path-to-interval [path-components]
@@ -338,7 +345,7 @@
               (update :uuid/used u/conjs uuid)
               ;; here the path is wrong
               (assoc-in (path-to-interval new-path) new-interval))
-      :nav [navigation "edit"]})))
+      :nav [navigation :push "edit"]})))
 
 ;;;
 ;;; edit-screen
@@ -346,8 +353,7 @@
 ;;;
 
 #_(comment
-  (path-to-interval [:a :b :c])
-)
+    (path-to-interval [:a :b :c]))
 
 (defn assoc-selected-interval-key [db k v]
   (assoc-in db
