@@ -7,7 +7,7 @@ function IntervalsItem(props) {
         title, //= "interval",
         duration, //= 10,
         repeat, //= 3,
-        pressedHandler = () => console.log("pressed")
+        pressedHandler, // = () => console.log("pressed")
     } = props
 
     // console.log("props")

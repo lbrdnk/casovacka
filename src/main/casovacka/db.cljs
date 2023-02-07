@@ -80,7 +80,7 @@
 
 (rf/reg-fx
  :nav
- (fn [[nav op-kw & args]]
+ (fn [[^js nav op-kw & args]]
    (case op-kw
      :back (.goBack nav)
      :navigate (.navigate nav (first args))
@@ -124,8 +124,11 @@
   (some #(when (= (:id %) (:selected-interval-id @re-frame.db/app-db)) %) (:intervals @re-frame.db/app-db)))
 
 (defn assoc-handler [interval navigation]
-  (assoc interval :onPressHandler #(rf/dispatch [:home-screen/interval-selected (:id interval) navigation])))
+  (assoc interval 
+         :onPressHandler #(rf/dispatch [:home-screen/interval-selected (:id interval) navigation])
+         :onEditHandler #(rf/dispatch [:home-screen/edit-interval-pressed (:id interval) navigation])))
 
+;; TODO add press handlers for edit mode
 (rf/reg-sub
  :home-screen/interval-list-items
  (fn [db [_ navigation]]
@@ -265,13 +268,17 @@
 (declare path-to-interval)
 
 (defn data-for-edit-screen [db _]
+  ;; following line works only in case 
   (let [selected-interval-path (path-to-interval (:edit-screen.selected-interval/path db))
         selected-interval (get-in db selected-interval-path)]
      ;; key, id, title, duration, repeat, intervals
     (-> (update selected-interval :intervals
                 (fn [intervals]
-                  (mapv #(select-keys % [:id :title :duration :repeat])
-                        (vals intervals))))
+                  (->> (vals intervals)
+                       ;; pick  
+                       (mapv #(select-keys % [:id :title :duration :repeat]))
+                       
+                       )))
         (assoc :key (:id selected-interval)))))
 
 (rf/reg-sub

@@ -1,4 +1,5 @@
-import { Button, FlatList, Text } from "react-native";
+import { useState } from "react";
+import { Button, FlatList, View, Text } from "react-native";
 import HomeItem from "./HomeItem"
 
 export default function HomeScreen(props) {
@@ -7,22 +8,30 @@ export default function HomeScreen(props) {
   // console.log(props.intervalListItems)
 
   const {
-    navigation,
     intervalListItems,
     newPressedHandler = () => console.log("new")
   } = props
 
+  const [editMode, setEditMode] = useState(false)
+
   return (
     <>
-    <FlatList
-      data={intervalListItems}
-      renderItem={({ item }) => <HomeItem 
-        key={item.id}
-        title={item.title}
-        onPressHandler={item.onPressHandler}
-      />}
-    />
-    <Button title="New Interval" onPress={newPressedHandler} />
+      <FlatList
+        // style={{ padding: 2, margin: 2, borderWidth: 2 }}
+        style={{ flex: 1, borderWidth: 2, padding: 2, margin: 2, borderColor: editMode ? "magenta" : "black"}}
+        // style={{flex: 1}}
+        data={intervalListItems}
+        renderItem={({ item }) => <HomeItem
+          key={item.id}
+          title={item.title}
+          onPressHandler={editMode ? item.onEditHandler : item.onPressHandler}
+        />}
+      />
+      <Button title="New Interval" onPress={newPressedHandler} />
+      <Button
+        title={editMode ? "run mode" : "edit mode"}
+        onPress={() => setEditMode(!editMode)}
+      />
     </>
   )
 }
