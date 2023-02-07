@@ -79,6 +79,9 @@
 (rf/reg-fx
  :nav
  (fn [[nav dest]]
+   #_(case dest
+
+     "back" (.goBack nav))
    (.push nav dest)
    #_(.navigate nav dest)))
 
@@ -275,24 +278,24 @@
 ;;; view should provide different handling for toplevel? -- which does actual flush
 ;;; WHEN should we actually flush?
 
-;; TODO
-;; may do handling also here
+;; TODO intervals
 (rf/reg-event-fx
  :edit-screen/save-pressed
  (fn [{:keys [db]} [_ from-js]]
-   (let [{:keys [duration title repeat] :as upd} (js->clj from-js :keywordize-keys true)]
+   (let [{:keys [duration title repeat] :as new-attributes} (js->clj from-js :keywordize-keys true)]
+     (def na new-attributes)
      ;; write new structure into db and do cleanup
      {:db (-> db
-              ;; update current timer values
-              ;; TODO use merge
-              (update :edit-screen/selected-interval assoc
+              (update :edit-screen/selected-interval assoc #_#_merge new-attributes
                       :title title
                       :duration duration
-                      :repeat repeat)
+                      :repeat repeat
+                      )
               ;; if toplevel, flush
               (cond->
                (empty? (:edit-screen.selected-interval/path db))
-                flush-interval-edit))})))
+                flush-interval-edit))
+      #_#_:nav [navigation "back"]})))
 
 ;; edit screen new button handling
 
@@ -305,7 +308,7 @@
 
 (defn path-to-interval [path-components]
   (reduce (fn [acc id] (into acc [:intervals id]))
-          [:edit-screen.selected-interval]
+          [:edit-screen/selected-interval]
           path-components))
 
 ;; should i use navigation ?
@@ -323,3 +326,48 @@
               (assoc-in new-path new-interval))
       :nav [navigation "edit"]})))
 
+;;;
+;;; edit-screen
+;;;   update fns
+;;;
+
+#_(comment
+  (path-to-interval [:a :b :c])
+)
+
+(defn assoc-selected-interval-key [db k v]
+  (assoc-in db
+            (u/conjv (path-to-interval (:edit-screen.selected-interval/path db)) k)
+            v))
+
+(rf/reg-event-db
+ :edit-screen/title-changed
+ (fn [db [_ val]]
+   (assoc-selected-interval-key db :title val)))
+
+(rf/reg-event-db
+ :edit-screen/duration-changed
+ (fn [db [_ val]]
+   (assoc-selected-interval-key db :duration val)))
+
+(rf/reg-event-db
+ :edit-screen/repeat-changed
+ (fn [db [_ val]]
+   (assoc-selected-interval-key db :repeat val)))
+
+;;;
+;;; edit-screen.header
+;;;
+
+;; this has no access to components local state
+;; hence should update on press into "tmp"
+(rf/reg-event-db
+ :edit-screen.header/back-pressed
+ (fn [db [_ nav]]
+   ;; save tmp state
+   #_(assoc)
+   ;; remove id from path
+   ;;   
+   ;; update 
+   #_(assoc db)
+   db))

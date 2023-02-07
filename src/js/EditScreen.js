@@ -55,12 +55,20 @@ export default function EditScreen(props) {
         deletePressedHandler,
         newPressedHandler,
         intervals,
-        savePressedHandler
+        savePressedHandler,
+        
+        title,
+        duration,
+        repeat,
+
+        updateTitle,
+        updateDuration,
+        updateRepeat,
     } = props;
 
-    const [title, setTitle] = useState(props.title || "");
-    const [duration, setDuration] = useState(props.duration || "");
-    const [repeat, setRepeat] = useState(props.repeat || "");
+    // const [title, setTitle] = useState(props.title || "");
+    // const [duration, setDuration] = useState(props.duration || "");
+    // const [repeat, setRepeat] = useState(props.repeat || "");
 
     return (
         <View
@@ -69,21 +77,21 @@ export default function EditScreen(props) {
             <Text>Edit!</Text>
             <TextInput
                 editable
-                onChangeText={setTitle}
+                onEndEditing={updateTitle}
                 placeholder="title"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={title}
             />
             <TextInput
                 editable
-                onChangeText={setDuration}
+                onEndEditing={updateDuration}
                 placeholder="duration"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={duration}
             />
             <TextInput
                 editable
-                onChangeText={setRepeat}
+                onEndEditing={updateRepeat}
                 placeholder="repeat"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={repeat}

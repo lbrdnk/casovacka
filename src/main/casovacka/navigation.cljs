@@ -8,6 +8,7 @@
 
             [goog.object :as gobj]
 
+            [re-frame.core :as rf]
             ;; dev
             ["react-native" :as rn]
             [reagent.core :as r]
@@ -44,6 +45,7 @@
                                                                                     :labelVisible true
                                                                                     :onPress (fn []
                                                                                                (.goBack nav)
+                                                                                               (rf/dispatch [:edit-screen.header/back-pressed])
                                                                                                (prn "PRESSED BACK"))}]))
                                                       :headerBackTitle "back"})))}
      [:> (.-Screen Stack) {:name "edit"
