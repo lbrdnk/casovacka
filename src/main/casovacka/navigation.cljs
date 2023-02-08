@@ -46,7 +46,7 @@
                                                                                     :onPress (fn []
                                                                                                (.goBack nav)
                                                                                                (rf/dispatch [:edit-screen.header/back-pressed])
-                                                                                               (prn "PRESSED BACK"))}]))
+                                                                                               #_(prn "PRESSED BACK"))}]))
                                                       :headerBackTitle "back"})))}
      [:> (.-Screen Stack) {:name "edit"
                            :component (r/reactify-component (with-meta view/edit-screen
