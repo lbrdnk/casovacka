@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, FlatList, Pressable, Text, TextInput, View } from "react-native";
 
 function IntervalsItem(props) {
@@ -62,7 +62,7 @@ export default function EditScreen(props) {
         newPressedHandler,
         intervals,
         savePressedHandler,
-        
+
         title,
         duration,
         repeat,
@@ -72,12 +72,18 @@ export default function EditScreen(props) {
         updateRepeat,
     } = props;
 
-    // const [title, setTitle] = useState(props.title || "");
-    // const [duration, setDuration] = useState(props.duration || "");
-    // const [repeat, setRepeat] = useState(props.repeat || "");
+    const [cacheTitle, setCacheTitle] = useState(props.title || "");
+    const [cacheDuration, setCacheDuration] = useState(props.duration || "");
+    const [cacheRepeat, setCacheRepeat] = useState(props.repeat || "");
 
     // console.log("toplevel intervals")
     // console.log(intervals)
+
+    useEffect(() => {
+        console.log("render x")
+    })
+
+
 
     return (
         <View
@@ -86,31 +92,29 @@ export default function EditScreen(props) {
             <Text>Edit!</Text>
             <TextInput
                 editable
-                onChangeText={updateTitle}
-            //     onEndEditing={ //(any) => {/*console.log(any.nativeEvent.text);*/ /*updateTitle(any.nativeEvent.text);}*/
-            //         updateTitle
-            // }
+                onChangeText={setCacheTitle}
+                onEndEditing={({ nativeEvent: { text } }) => updateTitle(text)}
                 placeholder="title"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
-                value={title}
+                value={cacheTitle}
             />
             <TextInput
                 editable
-                onChangeText={updateDuration}
-                // onEndEditing={updateDuration}
+                onChangeText={setCacheDuration}
+                onEndEditing={({ nativeEvent: { text } }) => updateDuration(text)}
                 placeholder="duration"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
-                value={duration}
+                value={cacheDuration}
             />
             <TextInput
                 editable
-                onChangeText={updateRepeat}
-                // onEndEditing={updateRepeat}
+                onChangeText={setCacheRepeat}
+                onEndEditing={({ nativeEvent: { text } }) => updateRepeat(text)}
                 placeholder="repeat"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
-                value={repeat}
+                value={cacheRepeat}
             />
-            <Intervals intervals={intervals} {...{newPressedHandler}} />
+            <Intervals intervals={intervals} {...{ newPressedHandler }} />
             <View style={{
                 flexDirection: "row",
                 justifyContent: "space-between",

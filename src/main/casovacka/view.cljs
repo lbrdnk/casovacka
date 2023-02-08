@@ -10,15 +10,6 @@
 
             ))
 
-#_(def HomeScreen (-> (js/require "../src/gen/HomeScreen.js") .-default))
-#_(def IntervalScreen (-> (js/require "../src/gen/IntervalScreen.js") .-default))
-#_(def EditScreen (-> (js/require "../src/gen/EditScreen.js") .-default))
-
-#_(defn text-from-event [^js e]
-  (let [text (gobj/getValueByKeys e "nativeEvent" "text")]
-    (prn text)
-    text))
-
 (defn edit-screen [props]
   (let [props (merge
 
@@ -32,35 +23,31 @@
                ;; handlers fns
                ;; TODO
                ;;   - missing navigation
-               {:edit-screen/newPressedHandler #(#_#_prn "xixi" rf/dispatch [:edit-screen/new-pressed (:navigation props)])
-                :edit-screen/savePressedHandler #(#_#_prn "save" rf/dispatch [:edit-screen/save-pressed (:navigation props)])
-                
-                ;;:edit-screen/deletePressedHandler #(prn "delete" #_#_rf/dispatch [:edit-screen/delete-pressed])
-                ;;:edit-screen/cancelPressedHandler #(prn "cancel" #_#_rf/dispatch [:edit-screen/cancel-pressed])
-                
+               {:edit-screen/newPressedHandler #(rf/dispatch [:edit-screen/new-pressed (:navigation props)])
+                :edit-screen/savePressedHandler #(rf/dispatch [:edit-screen/save-pressed (:navigation props)])
+
                 ;; key, id, title, duration, repeat come from :edit-screen/data
-                :updateTitle #(do #_(prn %) (rf/dispatch [:edit-screen/title-changed %]))
+                :updateTitle #(rf/dispatch [:edit-screen/title-changed %])
                 :updateDuration #(rf/dispatch [:edit-screen/duration-changed %])
                 :updateRepeat #(rf/dispatch [:edit-screen/repeat-changed %])
-                
+
                 ;; EditScreen component props
-                ;; 
-                :deletePressedHandler #(rf/dispatch [:edit-screen/delete-pressed (:navigation props)])
+                :deletePressedHandler #(rf/dispatch [:edit-screen/delete-pressed (:navigation props)])})]
+    (def pe props)
+    [:> EditScreen props]))
 
-                })]
-    (def p props)
-    [:<>
-     [:> EditScreen props]
-     #_[:> rn/View [:> rn/Text "xixx"]]]
-    ))
-
+;; TODO level 2 component may save it?
 (defn home-screen
   [props]
   #_(def p props)
+  (fn [props])
   (let [interval-list-items @(rf/subscribe [:home-screen/interval-list-items (:navigation props)])
         props (merge props
                      {:home-screen/interval-list-items interval-list-items
-                      :newPressedHandler #(rf/dispatch [:home-screen/new-pressed (:navigation props)])})]
+                      :newPressedHandler #(rf/dispatch [:home-screen/new-pressed (:navigation props)])
+                      
+                      :test-text @(rf/subscribe [:sub.home-screen.test/text])
+                      :on-change-test-text #(rf/dispatch-sync [:e.home-screen.test/text-changed %])})]
     (def ph props)
     [:> HomeScreen props]))
 
@@ -69,7 +56,11 @@
 (defn interval-screen
   [props]
   (let [props (merge props
-                     {:title @(rf/subscribe [:selected-timer.sub/title])
+                     {
+                      
+                      ;; subs?
+                      ;; or data 
+                      :title @(rf/subscribe [:selected-timer.sub/title])
                       :timeStr @(rf/subscribe [:selected-timer.sub/time-str])
                       :running @(rf/subscribe [:selected-timer.sub/running])
                       ;; 

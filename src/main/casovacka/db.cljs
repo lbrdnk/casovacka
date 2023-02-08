@@ -505,3 +505,19 @@
  :edit-screen.header/back-pressed
  (fn [db _]
    (update db :edit-screen.selected-interval/path u/popv)))
+
+
+;;;
+;;; home-screen test
+;;;
+
+(rf/reg-event-db
+ :e.home-screen.test/text-changed
+ (fn [db [_ text]]
+   (assoc db :home-screen.test/text text)))
+
+(rf/reg-sub
+ :sub.home-screen.test/text
+ (fn [db _]
+   (get db :home-screen.test/text)))
+

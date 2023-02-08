@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, FlatList, View, Text } from "react-native";
+import { Button, FlatList, View, Text, TextInput } from "react-native";
 import HomeItem from "./HomeItem"
 
 export default function HomeScreen(props) {
@@ -9,7 +9,9 @@ export default function HomeScreen(props) {
 
   const {
     intervalListItems,
-    newPressedHandler = () => console.log("new")
+    newPressedHandler, //= () => console.log("new"),
+    testText,
+    onChangeTestText,
   } = props
 
   const [editMode, setEditMode] = useState(false)
@@ -26,6 +28,10 @@ export default function HomeScreen(props) {
           title={item.title}
           onPressHandler={editMode ? item.onEditHandler : item.onPressHandler}
         />}
+      />
+      <TextInput
+        value={testText}
+        onChangeText={onChangeTestText}
       />
       <Button title="New Interval" onPress={newPressedHandler} />
       <Button
