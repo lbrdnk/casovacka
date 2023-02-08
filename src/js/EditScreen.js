@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, FlatList, Text, TextInput, View } from "react-native";
+import { Button, FlatList, Pressable, Text, TextInput, View } from "react-native";
 
 function IntervalsItem(props) {
 
@@ -12,16 +12,17 @@ function IntervalsItem(props) {
 
     // console.log("props")
     // console.log(props)
+    // console.log(pressedHandler)
 
     return (
-        <View
+        <Pressable
             style={{ borderWidth: 2, padding: 2, margin: 2 }}
             onPress={pressedHandler}
         >
             {title && <Text>title: {title}</Text>}
             {duration && <Text>duration: {duration}</Text>}
             {repeat && <Text>repeat: {repeat}</Text>}
-        </View>
+        </Pressable>
     )
 }
 

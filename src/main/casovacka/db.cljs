@@ -366,7 +366,7 @@
 
 (declare path-to-interval)
 
-(defn data-for-edit-screen [db _]
+(defn data-for-edit-screen [db [_ navigation]]
   ;; following line works only in case 
   (let [selected-interval-path (path-to-interval (:edit-screen.selected-interval/path db))
         selected-interval (get-in db selected-interval-path)]
@@ -376,6 +376,12 @@
                   (->> (vals intervals)
                        ;; pick  
                        (mapv #(select-keys % [:id :title :duration :repeat]))
+                       
+                       (mapv (fn [interval]
+                               ;; navigation prop
+                               (assoc interval 
+                                      :pressedHandler #(rf/dispatch [:edit-screen/interval-pressed (:id interval) navigation])))
+                             )
                        
                        )))
         (assoc :key (:id selected-interval)))))
@@ -452,6 +458,12 @@
               ;; here the path is wrong
               (assoc-in (path-to-interval new-path) new-interval))
       :nav [navigation :push "edit"]})))
+
+(rf/reg-event-fx
+ :edit-screen/interval-pressed
+ (fn [{:keys [db]} [_ id navigation]]
+   {:db (update db :edit-screen.selected-interval/path u/conjv id)
+    :nav [navigation :push "edit"]}))
 
 ;;;
 ;;; edit-screen

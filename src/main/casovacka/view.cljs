@@ -27,7 +27,7 @@
 
                ;; db data map
                ;; id, title, duration, repeat
-               @(rf/subscribe [:edit-screen/data])
+               @(rf/subscribe [:edit-screen/data (:navigation props)])
 
                ;; handlers fns
                ;; TODO
