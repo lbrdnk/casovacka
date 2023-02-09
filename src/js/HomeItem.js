@@ -1,4 +1,4 @@
-import { Text } from "react-native";
+import { View, Text } from "react-native";
 
 export default function HomeItem(props) {
 
@@ -11,10 +11,14 @@ export default function HomeItem(props) {
   // console.log(Object.keys(props))
 
   return (
-    <Text
-      onPress={onPressHandler}
+    <View
+      style={{ margin: 2, padding: 2, borderWidth: 2 }}
     >
-      {title}
-    </Text>
+      <Text
+        onPress={onPressHandler}
+      >
+        {title}
+      </Text>
+    </View>
   )
 }
