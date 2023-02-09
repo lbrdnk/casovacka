@@ -93,7 +93,7 @@ export function EditScreen(props) {
             <TextInput
                 editable
                 // onChangeText={setCacheTitle}
-                onChangeText={text => {setCacheTitle(text); updateTitle(text)}}
+                onChangeText={text => { setCacheTitle(text); updateTitle(text) }}
                 // onEndEditing={({ nativeEvent: { text } }) => updateTitle(text)}
                 // onEndEditing={(e) => console.log(e)}
                 placeholder="title"
@@ -103,7 +103,7 @@ export function EditScreen(props) {
             <TextInput
                 editable
                 // onChangeText={setCacheDuration}
-                onChangeText={text => {setCacheDuration(text); updateDuration(text)}}
+                onChangeText={text => { setCacheDuration(text); updateDuration(text) }}
                 // onEndEditing={({ nativeEvent: { text } }) => updateDuration(text)}
                 placeholder="duration"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
@@ -111,7 +111,7 @@ export function EditScreen(props) {
             />
             <TextInput
                 editable
-                onChangeText={(text) => {setCacheRepeat(text); updateRepeat(text)}}
+                onChangeText={(text) => { setCacheRepeat(text); updateRepeat(text) }}
                 // onEndEditing={({ nativeEvent: { text } }) => updateRepeat(text)}
                 // onBlur={({ nativeEvent: { text } }) => {console.log("blur");updateRepeat(text)}}
                 placeholder="repeat"
@@ -119,32 +119,6 @@ export function EditScreen(props) {
                 value={cacheRepeat}
             />
             <Intervals intervals={intervals} {...{ newPressedHandler }} />
-            <View style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 2,
-                padding: 2,
-            }}>
-                <View style={{ borderWidth: 2, }}>
-                    <Button
-                        title="delete"
-                        onPress={deletePressedHandler}
-                    />
-                </View>
-                <View style={{ flexDirection: "row" }}>
-                    {/*                     
-                    <View style={{ borderWidth: 2, }}>
-                        <Button title="cancel" onPress={cancelPressedHandler} />
-                    </View>
-                     */}
-                    <View style={{ borderWidth: 2, marginLeft: 4 }}>
-                        <Button
-                            title="save all and exit"
-                            onPress={savePressedHandler}
-                        />
-                    </View>
-                </View>
-            </View>
         </View>
     )
 }

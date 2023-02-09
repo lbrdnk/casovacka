@@ -1,70 +1,49 @@
 (ns casovacka.view
   (:require [re-frame.core :as rf]
-            #_[reagent.core :as r]
-            #_["react-native" :as rn]
             ["/EditScreen" :refer [EditScreen]]
             ["/IntervalScreen" :refer [IntervalScreen]]
-            ["/HomeScreen" :refer [HomeScreen]]
-
-            [goog.object :as gobj]))
+            ["/HomeScreen" :refer [HomeScreen]]))
 
 (defn edit-screen
   [props]
   (let [props (merge
-
                ;; orig props
                props
-
-               ;; db data map
-               ;; id, title, duration, repeat
-               @(rf/subscribe [:edit-screen/data (:navigation props)])
-
-               ;; handlers fns
-               ;; TODO
-               ;;   - missing navigation
-               {:edit-screen/newPressedHandler #(rf/dispatch [:edit-screen/new-pressed (:navigation props)])
-                :edit-screen/savePressedHandler #(rf/dispatch [:edit-screen/save-pressed (:navigation props)])
-
-                ;; key, id, title, duration, repeat come from :edit-screen/data
-                :updateTitle #(rf/dispatch [:edit-screen/title-changed %])
-                :updateDuration #(rf/dispatch [:edit-screen/duration-changed %])
-                :updateRepeat #(rf/dispatch [:edit-screen/repeat-changed %])
-
-                ;; EditScreen component props
-                :deletePressedHandler #(rf/dispatch [:edit-screen/delete-pressed (:navigation props)])})]
+               {;; props
+                :title                @(rf/subscribe [:sub.edit-screen.selected-interval/title])
+                :duration             @(rf/subscribe [:sub.edit-screen.selected-interval/duration])
+                :repeat               @(rf/subscribe [:sub.edit-screen.selected-interval/repeat])
+                :intervals            @(rf/subscribe [:sub.edit-screen.selected-interval/intervals (:navigation props)])
+                ;; handlers
+                :newPressedHandler    #(rf/dispatch [:e.edit-screen/new-pressed (:navigation props)])
+                :deletePressedHandler #(rf/dispatch [:e.edit-screen/delete-pressed (:navigation props)])
+                :savePressedHandler   #(rf/dispatch [:e.dit-screen/save-pressed (:navigation props)])
+                :updateTitle          #(rf/dispatch [:e.edit-screen/title-changed %])
+                :updateDuration       #(rf/dispatch [:e.edit-screen/duration-changed %])
+                :updateRepeat         #(rf/dispatch [:e.edit-screen/repeat-changed %])})]
     (def pe props)
     [:> EditScreen props]))
 
-;; TODO level 2 component may save it?
 (defn home-screen
   [props]
-  #_(def p props)
-  (fn [props])
-  (let [interval-list-items @(rf/subscribe [:home-screen/interval-list-items (:navigation props)])
+  (let [navigation (:navigation props)
         props (merge props
-                     {:home-screen/interval-list-items interval-list-items
-                      :newPressedHandler #(rf/dispatch [:home-screen/new-pressed (:navigation props)])
-                      
-                      :test-text @(rf/subscribe [:sub.home-screen.test/text])
-                      :on-change-test-text #(rf/dispatch-sync [:e.home-screen.test/text-changed %])})]
+                     {:intervals         @(rf/subscribe [:sub.home-screen/intervals navigation])
+                      :newPressedHandler #(rf/dispatch [:e.home-screen/new-pressed navigation])})]
     (def ph props)
     [:> HomeScreen props]))
-
-
 
 (defn interval-screen
   [props]
   (let [props (merge props
-                     {
-                      
-                      ;; subs?
+                     {;; subs?
                       ;; or data 
-                      :title @(rf/subscribe [:selected-timer.sub/title])
-                      :timeStr @(rf/subscribe [:selected-timer.sub/time-str])
-                      :running @(rf/subscribe [:selected-timer.sub/running])
+                      :title               @(rf/subscribe [:selected-timer.sub/title])
+                      :timeStr             @(rf/subscribe [:selected-timer.sub/time-str])
+                      :running             @(rf/subscribe [:selected-timer.sub/running])
                       ;; 
                       :startPressedHandler #(rf/dispatch [:interval-screen/start-pressed])
-                      :stopPressedHandler #(rf/dispatch [:interval-screen/stop-pressed])
+                      :stopPressedHandler  #(rf/dispatch [:interval-screen/stop-pressed])
                       :resetPressedHandler #(rf/dispatch [:interval-screen/reset-pressed])})]
-    #_(def p props)
+    (def pi props)
     [:> IntervalScreen props]))

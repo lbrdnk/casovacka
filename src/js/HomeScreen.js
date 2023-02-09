@@ -1,6 +1,28 @@
 import { useState } from "react";
 import { Button, FlatList, View, Text, TextInput } from "react-native";
-import HomeItem from "./HomeItem"
+
+export function HomeItem(props) {
+
+  const {
+    title,
+    onPressHandler,
+  } = props
+
+  console.log(Object.keys(props))
+
+
+  return (
+    <View
+      style={{ margin: 2, padding: 2, borderWidth: 2, }}
+    >
+      <Text
+        onPress={onPressHandler}
+      >
+        {title}
+      </Text>
+    </View>
+  )
+}
 
 export function HomeScreen(props) {
 
@@ -8,10 +30,8 @@ export function HomeScreen(props) {
   // console.log(props.intervalListItems)
 
   const {
-    intervalListItems,
-    newPressedHandler, //= () => console.log("new"),
-    testText,
-    onChangeTestText,
+    intervals,
+    newPressedHandler
   } = props
 
   const [editMode, setEditMode] = useState(false)
@@ -21,17 +41,12 @@ export function HomeScreen(props) {
       <FlatList
         // style={{ padding: 2, margin: 2, borderWidth: 2 }}
         style={{ flex: 1, borderWidth: 2, padding: 2, margin: 2, borderColor: editMode ? "magenta" : "black"}}
-        // style={{flex: 1}}
-        data={intervalListItems}
+        data={intervals}
         renderItem={({ item }) => <HomeItem
           key={item.id}
           title={item.title}
-          onPressHandler={editMode ? item.onEditHandler : item.onPressHandler}
+          onPressHandler={editMode ? item.editPressedHandler : item.selectPressedHandler}
         />}
-      />
-      <TextInput
-        value={testText}
-        onChangeText={onChangeTestText}
       />
       <Button title="New Interval" onPress={newPressedHandler} />
       <Button
@@ -41,23 +56,3 @@ export function HomeScreen(props) {
     </>
   )
 }
-
-// renderItem={({ item }) => <HomeItem
-// key={item.id}
-// title={item.title}
-// onPressHandler={item.onPressHandler}
-
-
-// [
-//   {
-//     key: "xixi",
-//     onPressHandler: () => {console.log("press"); props.navigation.navigate("interval")}
-//   },
-//   {
-//     key: "lol",
-//     onPressHandler: () => {console.log("press"); props.navigation.navigate("interval")}
-//   }
-// ]
-
-// renderItem={({ item }) => <Text>{item.key}</Text>}
-// renderItem={item => <HomeItem {...item}/>}

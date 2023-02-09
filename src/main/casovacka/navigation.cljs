@@ -9,23 +9,16 @@
             [goog.object :as gobj]
 
             [re-frame.core :as rf]
-            ;; dev
-            ["react-native" :as rn]
             [reagent.core :as r]
             [casovacka.dev :as dev]))
 
-;;; (defonce Stack (createNativeStackNavigator))
 (def Stack (createNativeStackNavigator))
 
 (defn navigation []
   ;; independent because of storybook nesting
-  
-  ;; TODO verify if this wont cause problems
   [:> NavigationContainer 
-   {:independent true
-    
-    ;; #_#_#_#_
-    ;; check if nil ok
+   {;; dev purposes, TODO mask with closure defines
+    :independent true
     :initialState @dev/navigation-state
     :onStateChange #(reset! dev/navigation-state %)}
    [:> (.-Navigator Stack)
@@ -38,16 +31,20 @@
     [:> (.-Group Stack) {:screenOptions (fn [^js props]
                                           (let [nav (gobj/get props "navigation")]
                                             (clj->js {:headerLeft (fn [^js y]
-                                                                    (def pp props)
-                                                                    (def yy y)
                                                                     (r/as-element [:> HeaderBackButton
                                                                                    {:label "back"
                                                                                     :labelVisible true
                                                                                     :onPress (fn []
-                                                                                               (.goBack nav)
-                                                                                               (rf/dispatch [:edit-screen.header/back-pressed])
-                                                                                               #_(prn "PRESSED BACK"))}]))
-                                                      :headerBackTitle "back"})))}
+                                                                                               (rf/dispatch [:e.edit-screen/back-pressed nav]))}]))
+                                                      :headerBackTitle "back"
+                                                      :headerRight (fn [^js y]
+                                                                     (r/as-element [:> HeaderBackButton
+                                                                                    {:label "delete"
+                                                                                     :backImage nil
+                                                                                     :tintColor "red"
+                                                                                     :labelVisible true
+                                                                                     :onPress (fn []
+                                                                                                (rf/dispatch [:e.edit-screen/delete-pressed nav]))}]))})))}
      [:> (.-Screen Stack) {:name "edit"
                            :component (r/reactify-component (with-meta view/edit-screen
                                                               {:displayName "EditScreen"}))}]]]])
