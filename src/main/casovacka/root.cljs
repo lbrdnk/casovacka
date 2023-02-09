@@ -1,2 +1,0 @@
-(ns casovacka.root)
-
