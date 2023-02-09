@@ -92,8 +92,9 @@ export function EditScreen(props) {
             <Text style={{ borderWidth: 4, padding: 2, margin: 2 }}>Edit</Text>
             <TextInput
                 editable
-                onChangeText={setCacheTitle}
-                onEndEditing={({ nativeEvent: { text } }) => updateTitle(text)}
+                // onChangeText={setCacheTitle}
+                onChangeText={text => {setCacheTitle(text); updateTitle(text)}}
+                // onEndEditing={({ nativeEvent: { text } }) => updateTitle(text)}
                 // onEndEditing={(e) => console.log(e)}
                 placeholder="title"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
@@ -101,16 +102,18 @@ export function EditScreen(props) {
             />
             <TextInput
                 editable
-                onChangeText={setCacheDuration}
-                onEndEditing={({ nativeEvent: { text } }) => updateDuration(text)}
+                // onChangeText={setCacheDuration}
+                onChangeText={text => {setCacheDuration(text); updateDuration(text)}}
+                // onEndEditing={({ nativeEvent: { text } }) => updateDuration(text)}
                 placeholder="duration"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={cacheDuration}
             />
             <TextInput
                 editable
-                onChangeText={setCacheRepeat}
-                onEndEditing={({ nativeEvent: { text } }) => updateRepeat(text)}
+                onChangeText={(text) => {setCacheRepeat(text); updateRepeat(text)}}
+                // onEndEditing={({ nativeEvent: { text } }) => updateRepeat(text)}
+                // onBlur={({ nativeEvent: { text } }) => {console.log("blur");updateRepeat(text)}}
                 placeholder="repeat"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={cacheRepeat}
