@@ -1,6 +1,6 @@
 import { Button, View, Text } from "react-native";
 
-export default function IntervalScreen(props) {
+export function IntervalScreen(props) {
 
   // console.log(Object.keys(props))
   // console.log(props.title)

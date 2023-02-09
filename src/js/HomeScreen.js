@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, FlatList, View, Text, TextInput } from "react-native";
 import HomeItem from "./HomeItem"
 
-export default function HomeScreen(props) {
+export function HomeScreen(props) {
 
   // console.log(Object.keys(props))
   // console.log(props.intervalListItems)

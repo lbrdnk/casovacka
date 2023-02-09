@@ -54,7 +54,7 @@ function Intervals(props) {
     )
 }
 
-export default function EditScreen(props) {
+export function EditScreen(props) {
 
     const {
         // currently may be undefined, [], null
@@ -89,11 +89,12 @@ export default function EditScreen(props) {
         <View
             style={{ flex: 1 }}
         >
-            <Text>Edit!</Text>
+            <Text style={{ borderWidth: 4, padding: 2, margin: 2 }}>Edit</Text>
             <TextInput
                 editable
                 onChangeText={setCacheTitle}
                 onEndEditing={({ nativeEvent: { text } }) => updateTitle(text)}
+                // onEndEditing={(e) => console.log(e)}
                 placeholder="title"
                 style={{ borderWidth: 2, padding: 2, margin: 2 }}
                 value={cacheTitle}

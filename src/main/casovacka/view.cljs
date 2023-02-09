@@ -1,16 +1,15 @@
 (ns casovacka.view
   (:require [re-frame.core :as rf]
-            [reagent.core :as r]
-            ["react-native" :as rn]
-            ["/EditScreen$default" :as EditScreen]
-            ["/IntervalScreen$default" :as IntervalScreen]
-            ["/HomeScreen$default" :as HomeScreen]
-            
-            [goog.object :as gobj]
+            #_[reagent.core :as r]
+            #_["react-native" :as rn]
+            ["/EditScreen" :refer [EditScreen]]
+            ["/IntervalScreen" :refer [IntervalScreen]]
+            ["/HomeScreen" :refer [HomeScreen]]
 
-            ))
+            [goog.object :as gobj]))
 
-(defn edit-screen [props]
+(defn edit-screen
+  [props]
   (let [props (merge
 
                ;; orig props
