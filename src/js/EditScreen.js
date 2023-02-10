@@ -79,12 +79,6 @@ export function EditScreen(props) {
     // console.log("toplevel intervals")
     // console.log(intervals)
 
-    useEffect(() => {
-        console.log("render x")
-    })
-
-
-
     return (
         <View
             style={{ flex: 1 }}

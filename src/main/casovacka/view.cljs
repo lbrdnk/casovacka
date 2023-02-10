@@ -40,10 +40,13 @@
                       ;; or data 
                       :title               @(rf/subscribe [:selected-timer.sub/title])
                       :timeStr             @(rf/subscribe [:selected-timer.sub/time-str])
-                      :running             @(rf/subscribe [:selected-timer.sub/running])
-                      ;; 
-                      :startPressedHandler #(rf/dispatch [:interval-screen/start-pressed])
-                      :stopPressedHandler  #(rf/dispatch [:interval-screen/stop-pressed])
+                      
+                      ;; wip
+                      :running             @(rf/subscribe [:sub.interval-screen.timer/running])
+                      ;; wip
+                      :startPressedHandler #(rf/dispatch [:e.interval-screen.timer/start-pressed])
+                      :stopPressedHandler  #(rf/dispatch [:e.interval-screen.timer/stop-pressed])
+                      ;; wip
                       :resetPressedHandler #(rf/dispatch [:interval-screen/reset-pressed])})]
     (def pi props)
     [:> IntervalScreen props]))

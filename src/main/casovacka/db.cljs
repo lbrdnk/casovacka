@@ -191,6 +191,21 @@
 ;;; interval screen
 ;;;
 
+(rf/reg-event-db
+ :e.interval-screen.timer/start-pressed
+ (fn [db _]
+  (assoc db :interval-screen.timer/running true)))
+
+(rf/reg-event-db
+ :e.interval-screen.timer/stop-pressed
+ (fn [db _]
+   (assoc db :interval-screen.timer/running false)))
+
+(rf/reg-sub
+ :sub.interval-screen.timer/running
+ (fn [db _]
+   (-> db :interval-screen.timer/running boolean)))
+
 (rf/reg-fx
  :start-timer
  (fn [start]

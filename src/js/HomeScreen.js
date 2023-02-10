@@ -8,7 +8,7 @@ export function HomeItem(props) {
     onPressHandler,
   } = props
 
-  console.log(Object.keys(props))
+  // console.log(Object.keys(props))
 
 
   return (
