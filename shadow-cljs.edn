@@ -1,15 +1,11 @@
-;; shadow-cljs configuration
 {:source-paths
  ["src/main"
   "src/gen"
   "src/dev"]
 
- 
  :dependencies
  [[reagent "1.1.1"]
   [re-frame "1.3.0"]]
-
-;;  :external-index "foo/bar.js"
 
  :builds
  {:app
@@ -17,8 +13,6 @@
    :init-fn casovacka.core/init
    :output-dir "app"
    :dev {:closure-defines {casovacka.core/STORYBOOK true}}
-;;    :external-index "foo/bar.js"
-   #_#_:js-options {:js-provider :external
-                    :external-index "foo/bar.js"}
    :devtools {:autoload true
+              :reload-strategy :full
               :preloads [shadow.expo.keep-awake]}}}}
