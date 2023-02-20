@@ -2,7 +2,8 @@
   (:require [re-frame.core :as rf]
             ["/EditScreen" :refer [EditScreen]]
             ["/IntervalScreen" :refer [IntervalScreen]]
-            ["/HomeScreen" :refer [HomeScreen]]))
+            ["/HomeScreen" :refer [HomeScreen]]
+            [casovacka.db.util :as db.util]))
 
 (defn edit-screen
   [props]
@@ -36,16 +37,21 @@
 (defn interval-screen
   [props]
   (let [props (merge props
-                     {;; subs?
-                      ;; or data 
-                      :title               @(rf/subscribe [:selected-timer.sub/title])
-                      :timeStr             @(rf/subscribe [:selected-timer.sub/time-str])
-                      
+                     {:title              @(rf/subscribe [:sub.interval-screen.timer/title])
+
                       ;; wip
                       :running             @(rf/subscribe [:sub.interval-screen.timer/running])
+                      :totalMs             @(rf/subscribe [:sub.interval-screen.timer/total-ms])
+                      :startEpoch          @(rf/subscribe [:sub.interval-screen.timer/start-epoch])
                       ;; wip
+                      :timeStrFormatFn    db.util/ms->timer-str
+                      ;; wip
+                      #_:stopPressedHandler
                       :startPressedHandler #(rf/dispatch [:e.interval-screen.timer/start-pressed])
-                      :stopPressedHandler  #(rf/dispatch [:e.interval-screen.timer/stop-pressed])
+                      ;; !!!
+                      ;; % = current-ms
+                      :stopPressedHandler  #(rf/dispatch [:e.interval-screen.timer/stop-pressed %])
+                      #_#_:timerStoppedHandler #(rf/dispatch [:e.interval-screen.timer/stopped %])
                       ;; wip
                       :resetPressedHandler #(rf/dispatch [:interval-screen/reset-pressed])})]
     (def pi props)

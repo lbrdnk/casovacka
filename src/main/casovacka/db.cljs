@@ -191,22 +191,53 @@
 ;;; interval screen
 ;;;
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :e.interval-screen.timer/start-pressed
- (fn [db _]
-  (assoc db :interval-screen.timer/running true)))
+ [(rf/inject-cofx :now)]
+ (fn [{:keys [db now]} _]
+   {:db (assoc db
+               :interval-screen.timer/running true
+               :interval-screen.timer/start-epoch now)}))
 
 (rf/reg-event-db
  :e.interval-screen.timer/stop-pressed
- (fn [db _]
-   (assoc db :interval-screen.timer/running false)))
+ (fn [db [_ current-ms]]
+   ;; following code does not cleanup `startEpoch`
+   (-> db 
+       (assoc :interval-screen.timer/running false)
+       (update :interval-screen.timer/total-ms + current-ms))))
+
+#_(rf/reg-event-db
+ :e.interval-screen.timer/stopped
+ (fn [db [_ current-ms]]
+   (update db :interval-screen.timer/total-ms + current-ms)))
+
+;;;
+;;; sub.interval-screen
+;;;
 
 (rf/reg-sub
  :sub.interval-screen.timer/running
  (fn [db _]
    (-> db :interval-screen.timer/running boolean)))
 
-(rf/reg-fx
+(rf/reg-sub
+ :sub.interval-screen.timer/start-epoch
+ (fn [db _]
+   (-> db :interval-screen.timer/start-epoch long)))
+
+(rf/reg-sub
+ :sub.interval-screen.timer/total-ms
+ (fn [db _]
+   (-> db :interval-screen.timer/total-ms long)))
+
+(rf/reg-sub
+ :sub.interval-screen.timer/title
+ (fn [db _]
+   (-> db :interval-screen.timer/root :title str)))
+
+
+#_(rf/reg-fx
  :start-timer
  (fn [start]
    (letfn [(tick! []
@@ -216,14 +247,14 @@
                (rf/dispatch [:tick delta raf-id])))]
      (tick!))))
 
-(rf/reg-fx
+#_(rf/reg-fx
  :stop-timer
  (fn [[raf-id events]]
    (js/cancelAnimationFrame raf-id)
    (doseq [e events] (rf/dispatch e))))
 
 
-(rf/reg-event-db
+#_(rf/reg-event-db
  :stop-timer/stopped
  (fn [db _]
    (-> db
@@ -232,12 +263,12 @@
               :selected-timer/raf-id nil)
        (update :selected-timer/total-ms + (:selected-timer/current-ms db)))))
 
-(rf/reg-event-db
+#_(rf/reg-event-db
  :stop-timer/reset
  (fn [db _]
    (assoc db :selected-timer/total-ms 0)))
 
-(rf/reg-event-fx
+#_(rf/reg-event-fx
  :interval-screen/start-pressed
  [(rf/inject-cofx :now)]
  (fn [{:keys [db now]} _]
@@ -247,7 +278,7 @@
                :selected-timer/current-ms 0)
     :start-timer now}))
 
-(rf/reg-event-db
+#_(rf/reg-event-db
  :tick
  (fn [db [_ passed-ms raf-id]]
    (-> db
@@ -255,31 +286,20 @@
               :selected-timer/current-ms passed-ms))))
 
 ;; update to pressed -> fx stop -> e stopped
-(rf/reg-event-fx
+#_(rf/reg-event-fx
  :interval-screen/stop-pressed
  (fn [{:keys [db]} _]
    {:stop-timer [(:selected-timer/raf-id db) [[:stop-timer/stopped]]]}))
 
-(rf/reg-event-fx
+#_(rf/reg-event-fx
  :interval-screen/reset-pressed
  (fn [{:keys [db]} _]
    {:stop-timer [(:selected-timer/raf-id db) [[:stop-timer/stopped] [:stop-timer/reset]]]}))
 
-(rf/reg-sub
+#_(rf/reg-sub
  :selected-timer.sub/time-str
  (fn [db _]
    (db.util/ms->timer-str (+ (:selected-timer/total-ms db) (:selected-timer/current-ms db)))))
-
-(rf/reg-sub
- :selected-timer.sub/running
- (fn [db _]
-   (:selected-timer/running db)))
-
-;;; tmp
-(rf/reg-sub
- :selected-timer.sub/title
- (fn [db _]
-   (get-in db [:intervals (:selected-interval-id db) :title])))
 
 ;;;
 ;;; e.home-screen
@@ -291,10 +311,11 @@
    {:db (db.api/select-root-interval db root-id)
     :nav [navigation :push "edit"]}))
 
+;;; TODO update to new structure
 (rf/reg-event-fx
  :e.home-screen.intervals/select-pressed
  (fn [{:keys [db]} [_ interval-id navigation]]
-   {:db (assoc db :selected-interval-id interval-id)
+   {:db (db.api/interval-select-root-interval db interval-id)
     :nav [navigation :push "interval"]}))
 
 (rf/reg-event-fx

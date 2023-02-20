@@ -56,3 +56,12 @@
   (assoc db 
          :edit-screen/selected-interval (get-in db [:intervals root-id])
          :edit-screen.selected-interval/path-ids []))
+
+;;;
+;;; interval-screen
+;;;
+
+;; TODO divide modules into db.api.edit/, db.api.interval/
+
+(defn interval-select-root-interval [db root-id]
+  (assoc db :interval-screen.timer/root (get-in db [:intervals root-id])))

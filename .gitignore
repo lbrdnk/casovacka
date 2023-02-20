@@ -17,6 +17,7 @@ web-build/
 .clj-kondo
 .calva
 .shadow-cljs
+
 app
 BAK__*
 src/gen/**

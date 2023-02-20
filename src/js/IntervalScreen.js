@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, View, Text, Animated } from "react-native";
 
+const intervalMs = 100;
+
 export function Timer(props) {
 
   const {
     running,
-    // startEpoch,
-
+    startEpoch,
     totalMs,
+
+    timerStoppedHandler,
 
     timeStrFormatFn,
     startPressedHandler,
@@ -15,44 +18,38 @@ export function Timer(props) {
     resetPressedHandler
   } = props
 
-  
+  const [deltaMs, setDeltaMs] = useState(0);
 
-  // tmp
-  const startEpoch = 0;
-
-  const rafId = useRef(0);
-
-  // const nowEpochRef = useRef(0);
-
-  const [delta, setDelta] = useState(0);
-
-  // const [nowEpoch, setNowEpoch] = useState(0)
-
-  function tick() {
-    setDelta(Date.now() - startEpoch)
-    rafId.current = requestAnimationFrame(tick)
-  }
+  const intervalId = useRef(-1);
 
   useEffect(() => {
-    if (running) {
-      tick()
-    } else {
-      cancelAnimationFrame(rafId.current);
+    function runTimer() {
+      setDeltaMs(Date.now() - startEpoch)
     }
-    // console.log(running)
+    if (running && intervalId.current === -1) {
+      intervalId.current = setInterval(runTimer, intervalMs);
+    } else if (!running) {
+      clearInterval(intervalId.current);
+      intervalId.current = -1;
+      setDeltaMs(0);
+    }
     return () => {
-      cancelAnimationFrame(rafId.current);
+      clearInterval(intervalId.current);
+      intervalId.current = -1;
+      setDeltaMs(0);
     }
-  }, [running])
+  }, [running, startEpoch])
 
-  const timeStr = delta;
+  const totalCurMs = totalMs + deltaMs;
+
+  const timeStr = timeStrFormatFn(totalCurMs);
 
   return (
     <View>
       <Text style={{ fontVariant: ['tabular-nums'] }}>{timeStr}</Text>
       {
         running ? (
-          <Button title="stop" onPress={stopPressedHandler} />
+          <Button title="stop" onPress={() => stopPressedHandler(deltaMs)} />
         ) : (
           <Button title="start" onPress={startPressedHandler} />
         )
@@ -84,7 +81,7 @@ export function IntervalScreen(props) {
   }
 
   useEffect(() => {
-    console.log(running)
+    // console.log(running)
     // console.log("cic")
   }, [running])
 
